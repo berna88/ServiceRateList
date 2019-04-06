@@ -1,0 +1,5 @@
+Bundle-Name: ServiceRateList
+Bundle-SymbolicName: ServiceRateList
+Bundle-Version: 1.0.0-SNAPSHOT
+Liferay-Configuration-Path: /configuration
+-metatype: *
