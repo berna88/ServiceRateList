@@ -48,12 +48,11 @@ public class GetMappingRate {
 		// Metodo que filtra por codigo
 		public List<Rate> getArticlesByCodeBrand() throws PortalException{
 			
-			List<JournalArticle> articlesFilterCategories = Util.getWebContentRate();// Obtiene los datos ya filtrados por query
+			//List<JournalArticle> articlesFilterCategories = Util.getWebContentRate();// Obtiene los datos ya filtrados por query
 			
-			List<JournalArticle> articlesFilterContract = new ArrayList<JournalArticle>();
+			//List<JournalArticle> articlesFilterContract = new ArrayList<JournalArticle>();
 			
-			GetMappingRate rate = new GetMappingRate();
-		
+			
 			List<Rate> rates = new ArrayList<>();
 			
 			String locale = Contants.getLanguaje();// Contiene el lenguaje
@@ -65,8 +64,8 @@ public class GetMappingRate {
 				String codes = Contants.CONTRACTCODES;// vienen los contratos filtrados
 				Contants.CONTRACTCODES = "";// se restablece el valor
 				String[] codesSplit = codes.split(",");
-				
-				for(JournalArticle a:articlesFilterCategories){
+				rates = Util.getWebContentRate(codesSplit,locale);
+				/*for(JournalArticle a:articlesFilterCategories){
 					
 					for(int i = 0; i < codesSplit.length;i++)
 					{
@@ -74,16 +73,17 @@ public class GetMappingRate {
 						   {articlesFilterContract.add(a); break;}
 					}
 				}
-				
-				rates = rate.RatesContents(articlesFilterContract, locale);
+				*/
+				//rates = RatesContents(articlesFilterCategories, locale);
 			}else{
-				rates = rate.RatesContents(articlesFilterCategories, locale);
+				rates = Util.getWebContentRate(locale);
+				
 			}
 			return rates;
 		}
 	
 	
-	public Contents getXML() throws PortalException{
+	public final Contents getXML() throws PortalException{
 		String nameBrand = Contants.getNameBrand(Contants.CODIGODEMARCA);
 		
 		//Se crea el brand que contendra toda la información
@@ -103,7 +103,7 @@ public class GetMappingRate {
 		
 		List <Content> content = new  ArrayList<Content>();
 		content.add(new Content(brand));
-		Contents contents = new Contents();
+		final Contents contents = new Contents();
 		contents.setContent(content);
 		return contents;
 	
@@ -131,7 +131,7 @@ public class GetMappingRate {
 		TInicio = System.currentTimeMillis(); 
 		
 		for(JournalArticle article: articles){
-			Rate rate = new Rate();
+			final Rate rate = new Rate();
 			//rate.setArticleId(article.getArticleId());
 			rate.setTitle(article.getTitle(locale));
 			Document document = null;
@@ -139,6 +139,16 @@ public class GetMappingRate {
 				
 				// Asignando valores al objeto haciendo el filtrado por el nombre de la categoria
 				document = SAXReaderUtil.read(article.getContentByLocale(locale));
+				/*log.info(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
+				log.info(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
+				log.info(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
+				log.info(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
+				log.info(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
+				log.info(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
+				log.info(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
+				log.info(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
+				log.info(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));*/
+			
 				rate.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
 				rate.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
 				rate.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
@@ -184,7 +194,7 @@ public class GetMappingRate {
 		TFin = System.currentTimeMillis();
 		tiempo = TFin - TInicio; //Calculamos los milisegundos de diferencia
 		log.info("Fin de proceso de parseo de datos " + tiempo); 
-		log.error("Finalizacion de parseo");
+		log.info("Finalizacion de parseo");
 		return rates;
 	}
 	

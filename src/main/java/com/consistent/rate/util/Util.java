@@ -5,7 +5,10 @@ import java.util.List;
 
 import com.consistent.rate.constants.Contants;
 import com.consistent.rate.mapping.RoomMapping;
+import com.consistent.rate.models.Rate;
 import com.consistent.rate.models.hotel.MediaLink;
+import com.consistent.rate.models.hotel.MediaLinks;
+import com.consistent.rate.models.hotel.Multimedia;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetVocabulary;
@@ -36,6 +39,8 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
 
 
@@ -88,6 +93,157 @@ public class Util {
 	
 		
 		// Obteniendo los web content de rate por categorias
+		public static List<Rate> getWebContentRate(String[] codesSplit,String locale) throws PortalException{
+			log.info("<---------- Metodo getWebContentRate ---------->");
+			AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
+			List<Rate> rates = new ArrayList<Rate>();
+			Long categoryId = getCategory(Contants.CODIGODEMARCA);
+			assetEntryQuery.setAnyCategoryIds(new long[] { categoryId });
+			assetEntryQuery.setClassName("com.liferay.journal.model.JournalArticle");
+			List<AssetEntry> assetEntryList = AssetEntryLocalServiceUtil.getEntries(assetEntryQuery);
+			log.info("Size:"+assetEntryList.size());
+			Long structureId = getStructure();
+			List<JournalArticle> article = new ArrayList<JournalArticle>();
+			
+			try {
+				for (AssetEntry ae : assetEntryList) {
+					//System.out.println(ae.getClassName() + " = "+ae.getClassNameId());
+				    JournalArticleResource journalArticleResource = JournalArticleResourceLocalServiceUtil.getJournalArticleResource(ae.getClassPK());
+				    JournalArticle journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleResource.getResourcePrimKey());
+				    if(journalArticle.getGroupId() == Contants.SITE_ID){
+				    	if(journalArticle.getDDMStructure().getStructureId() == structureId){
+				    		for(int i = 0; i < codesSplit.length;i++)
+							{
+								if(journalArticle.getContent().contains(codesSplit[i]))
+								   {
+									//article.add(journalArticle);
+									final Rate rate = new Rate();
+									rate.setTitle(journalArticle.getTitle(locale));
+									Document document = null;
+									document = SAXReaderUtil.read(journalArticle.getContentByLocale(locale));
+									
+									rate.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
+									rate.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
+									rate.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
+									rate.setDescription(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
+									rate.setShortDescription(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
+									rate.setBenefits(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
+									rate.setRestrictions(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
+									rate.setCurrency(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
+									rate.setEnddate(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
+									rate.setGuid(journalArticle.getArticleId());
+									rate.setLanguage(Contants.LENGUAJE);
+									rate.setChannel("www");
+									rate.setOrder("0");
+									
+									List<Multimedia> multimedia = new ArrayList<>();
+									Multimedia multi = new Multimedia();
+									multi.setUrl(document.valueOf("//dynamic-element[@name='mediaLinkRate']/dynamic-content/text()"));
+									multi.setType("icon");
+									multimedia.add(multi);
+									
+									List<MediaLink> medialink = new ArrayList<>();
+									MediaLink link = new MediaLink();
+									link.setKeyword("rate_icon");
+									link.setType("image");
+									link.setMultimedia(multimedia);
+									medialink.add(link);
+									
+									List<MediaLinks> mediaLinks = new ArrayList<>();
+									MediaLinks links = new MediaLinks();
+									links.setMedialinks(medialink);
+									mediaLinks.add(links);
+									rate.setMediaLinks(mediaLinks);
+									rates.add(rate);
+								   
+								   break;}
+							}
+					   // article.add(journalArticle);
+					    }
+				    }
+				}
+			} catch (Exception e) {
+				log.error("module getWebContentRate: "+e);
+			}
+			return rates;
+			
+		}
+		
+		
+		public static List<Rate> getWebContentRate(String locale) throws PortalException{
+			log.info("<---------- Metodo getWebContentRate Sin contrato---------->");
+			AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
+			List<Rate> rates = new ArrayList<Rate>();
+			Long categoryId = getCategory(Contants.CODIGODEMARCA);
+			assetEntryQuery.setAnyCategoryIds(new long[] { categoryId });
+			assetEntryQuery.setClassName("com.liferay.journal.model.JournalArticle");
+			List<AssetEntry> assetEntryList = AssetEntryLocalServiceUtil.getEntries(assetEntryQuery);
+			log.info("Size:"+assetEntryList.size());
+			Long structureId = getStructure();
+			
+			try {
+				for (AssetEntry ae : assetEntryList) {
+					//System.out.println(ae.getClassName() + " = "+ae.getClassNameId());
+				    JournalArticleResource journalArticleResource = JournalArticleResourceLocalServiceUtil.getJournalArticleResource(ae.getClassPK());
+				    JournalArticle journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleResource.getResourcePrimKey());
+				    if(journalArticle.getGroupId() == Contants.SITE_ID){
+				    	if(journalArticle.getDDMStructure().getStructureId() == structureId){
+				    			
+									//article.add(journalArticle);
+									final Rate rate = new Rate();
+									rate.setTitle(journalArticle.getTitle(locale));
+									Document document = null;
+									document = SAXReaderUtil.read(journalArticle.getContentByLocale(locale));
+									
+									rate.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
+									rate.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
+									rate.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
+									rate.setDescription(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
+									rate.setShortDescription(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
+									rate.setBenefits(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
+									rate.setRestrictions(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
+									rate.setCurrency(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
+									rate.setEnddate(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
+									rate.setGuid(journalArticle.getArticleId());
+									rate.setLanguage(Contants.LENGUAJE);
+									rate.setChannel("www");
+									rate.setOrder("0");
+									
+									List<Multimedia> multimedia = new ArrayList<>();
+									Multimedia multi = new Multimedia();
+									multi.setUrl(document.valueOf("//dynamic-element[@name='mediaLinkRate']/dynamic-content/text()"));
+									multi.setType("icon");
+									multimedia.add(multi);
+									
+									List<MediaLink> medialink = new ArrayList<>();
+									MediaLink link = new MediaLink();
+									link.setKeyword("rate_icon");
+									link.setType("image");
+									link.setMultimedia(multimedia);
+									medialink.add(link);
+									
+									List<MediaLinks> mediaLinks = new ArrayList<>();
+									MediaLinks links = new MediaLinks();
+									links.setMedialinks(medialink);
+									mediaLinks.add(links);
+									rate.setMediaLinks(mediaLinks);
+									rates.add(rate);
+								   
+								 
+							
+					   // article.add(journalArticle);
+					    }
+				    }
+				}
+			} catch (Exception e) {
+				log.error("module getWebContentRate: "+e);
+			}
+			return rates;
+			
+		}
+		
+		
+		// Obteniendo los web content de rate por categorias
 		public static List<JournalArticle> getWebContentRate() throws PortalException{
 			log.info("<---------- Metodo getWebContentRate ---------->");
 			AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
@@ -105,6 +261,7 @@ public class Util {
 				    JournalArticle journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleResource.getResourcePrimKey());
 				    if(journalArticle.getGroupId() == Contants.SITE_ID){
 				    	if(journalArticle.getDDMStructure().getStructureId() == structureId){
+				    		
 					    article.add(journalArticle);
 					    }
 				    }
