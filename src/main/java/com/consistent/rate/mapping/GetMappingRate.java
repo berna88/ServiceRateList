@@ -47,34 +47,38 @@ public class GetMappingRate {
 	
 		// Metodo que filtra por codigo
 		public List<Rate> getArticlesByCodeBrand() throws PortalException{
-			// Articulos filtrados 
-			List<JournalArticle> articles = Util.getWebContentRate();
-			List<JournalArticle> articles1 = new ArrayList<JournalArticle>();
+			
+			List<JournalArticle> articlesFilterCategories = Util.getWebContentRate();// Obtiene los datos ya filtrados por query
+			
+			List<JournalArticle> articlesFilterContract = new ArrayList<JournalArticle>();
+			
 			GetMappingRate rate = new GetMappingRate();
+		
 			List<Rate> rates = new ArrayList<>();
-			String locale = Contants.getLanguaje();
-			System.out.println("Contants.CONTRACTCODES:"+Contants.CONTRACTCODES);
+			
+			String locale = Contants.getLanguaje();// Contiene el lenguaje
+			
+			log.info("Contratos: "+ Contants.CONTRACTCODES);
+			// condicion para filtrar contratos
 			if(!Contants.CONTRACTCODES.equals("")){
-				System.out.println("line 57");
-				String codes = Contants.CONTRACTCODES;
-				Contants.CONTRACTCODES = "";
+				
+				String codes = Contants.CONTRACTCODES;// vienen los contratos filtrados
+				Contants.CONTRACTCODES = "";// se restablece el valor
 				String[] codesSplit = codes.split(",");
 				
-				for(JournalArticle a:articles){
+				for(JournalArticle a:articlesFilterCategories){
 					
 					for(int i = 0; i < codesSplit.length;i++)
 					{
 						if(a.getContent().contains(codesSplit[i]))
-						   {articles1.add(a); break;}
+						   {articlesFilterContract.add(a); break;}
 					}
 				}
 				
-				rates = rate.RatesContents(articles1, locale);
+				rates = rate.RatesContents(articlesFilterContract, locale);
 			}else{
-				rates = rate.RatesContents(articles, locale);
+				rates = rate.RatesContents(articlesFilterCategories, locale);
 			}
-			
-			
 			return rates;
 		}
 	
@@ -104,6 +108,7 @@ public class GetMappingRate {
 		return contents;
 	
 	}
+	
 	public Hotel getHotel() throws PortalException{
 		long id_base= _util_rate.getFolderBaseByConfiguration(Contants.SITE_ID);
         long id_brand = _util_rate.journalRootFolder(id_base,Contants.CODIGODEMARCA.toUpperCase(),Contants.SITE_ID);
@@ -118,11 +123,13 @@ public class GetMappingRate {
 
 	
 	
-	public List<Rate> RatesContents(List<JournalArticle> articles, String locale) throws PortalException {
+	public final List<Rate> RatesContents(List<JournalArticle> articles, String locale) throws PortalException {
 		log.info("<------ Metodo RatesContents ------>");
 		List<Rate> rates = new ArrayList<Rate>();
+		
 		long TInicio, TFin, tiempo;
 		TInicio = System.currentTimeMillis(); 
+		
 		for(JournalArticle article: articles){
 			Rate rate = new Rate();
 			//rate.setArticleId(article.getArticleId());
