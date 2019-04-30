@@ -25,7 +25,7 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
  
 @XmlRootElement // Permite parsear nuestra entidad a XML o JSON según el Accept de la petición
-@Deprecated
+//@Deprecated
 /**
  * 
  * @deprecated should probably be removed
