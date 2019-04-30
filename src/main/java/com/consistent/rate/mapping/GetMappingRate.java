@@ -63,6 +63,7 @@ public class GetMappingRate {
 				
 				String codes = Contants.CONTRACTCODES;// vienen los contratos filtrados
 				Contants.CONTRACTCODES = "";// se restablece el valor
+				System.out.println("Con contratos");
 				String[] codesSplit = codes.split(",");
 				rates = Util.getWebContentRate(codesSplit,locale);
 				/*for(JournalArticle a:articlesFilterCategories){
@@ -77,7 +78,7 @@ public class GetMappingRate {
 				//rates = RatesContents(articlesFilterCategories, locale);
 			}else{
 				rates = Util.getWebContentRate(locale);
-				
+				System.out.println("Sin contratos");
 			}
 			return rates;
 		}

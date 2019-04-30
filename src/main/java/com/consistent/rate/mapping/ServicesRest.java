@@ -1,20 +1,13 @@
 package com.consistent.rate.mapping;
 
-import java.net.SocketException;
-import java.net.UnknownHostException;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.osgi.service.component.annotations.Reference;
-
 import com.consistent.rate.constants.Contants;
 import com.consistent.rate.models.Contents;
-import com.consistent.rate.models.hotel.Hotel;
 import com.consistent.rate.util.Util;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
