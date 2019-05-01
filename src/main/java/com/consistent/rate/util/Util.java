@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
@@ -65,12 +66,12 @@ public class Util {
 		return structure;
 	}
 	
-	public static String getStrunture(String name){
+	public static String getStrunture(String name) throws PortalException{
 		log.info("Consulta Hoteles");
 		String structureKey = "";
 		Long parentFolderId = null;
 		Long folderId = null; 
-		
+		List<JournalArticle> journalArray = new ArrayList<>();
 		DynamicQuery structureQuery = DDMStructureLocalServiceUtil.dynamicQuery().add(PropertyFactoryUtil.forName("name").like("%"+name+"%"));
 		List<DDMStructure> results = DDMStructureLocalServiceUtil.dynamicQuery(structureQuery);
 		structureKey = results.get(0).getStructureKey();
@@ -86,20 +87,25 @@ public class Util {
 		
 		
 		DynamicQuery dynamicQueryFolderId = DynamicQueryFactoryUtil.forClass(JournalFolderImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
-		dynamicQueryFolderId.add(PropertyFactoryUtil.forName("name").like("%ex%"));
+		dynamicQueryFolderId.add(PropertyFactoryUtil.forName("name").eq("ex"));
 		dynamicQueryFolderId.add(PropertyFactoryUtil.forName("groupId").eq(Contants.SITE_ID));
 		dynamicQueryFolderId.add(PropertyFactoryUtil.forName("parentFolderId").eq(parentFolderId));
-		List<JournalFolder> foldersId = JournalFolderLocalServiceUtil.dynamicQuery(dynamicQueryFolder);
+		List<JournalFolder> foldersId = JournalFolderLocalServiceUtil.dynamicQuery(dynamicQueryFolderId);
 		folderId = foldersId.get(0).getFolderId();
 		log.info(folderId);
 		
-		
-		/*DynamicQuery dynamicQueryJournal = DynamicQueryFactoryUtil.forClass(JournalArticleImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
+		DynamicQuery dynamicQueryJournal = DynamicQueryFactoryUtil.forClass(JournalArticleImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
 		dynamicQueryJournal.add(PropertyFactoryUtil.forName("DDMStructureKey").eq(structureKey));
+		dynamicQueryJournal.add(PropertyFactoryUtil.forName("groupId").eq(new Long(Contants.SITE_ID)));
 		dynamicQueryJournal.add(PropertyFactoryUtil.forName("treePath").like("%"+folderId+"%"));
 		List<JournalArticle> journalArticles = JournalArticleLocalServiceUtil.dynamicQuery(dynamicQueryJournal);
-		log.info(journalArticles);*/
-		
+		for (JournalArticle journal : journalArticles) {
+			 if(JournalArticleLocalServiceUtil.isLatestVersion(Contants.SITE_ID, journal.getArticleId(), journal.getVersion(),WorkflowConstants.STATUS_APPROVED)==true){
+				 journalArray.add(journal);
+			   	}
+			
+		}
+		log.info("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"+journalArray.size());
 		return structureKey;
 	}
 	
