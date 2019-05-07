@@ -5,12 +5,12 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "contents")
+@XmlRootElement(name = "hotels")
 public class Hotels {
 	
 	List<Hotel> hotels;
 	
-	@XmlElement(name = "content")
+	@XmlElement(name = "hotel")
 	public List<Hotel> getHotels() {
 		return hotels;
 	}

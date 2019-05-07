@@ -87,6 +87,7 @@ public class GetMappingRate {
 	public final Contents getXML() throws PortalException{
 		String nameBrand = Contants.getNameBrand(Contants.CODIGODEMARCA);
 		
+		
 		//Se crea el brand que contendra toda la información
 		Brand brand = new Brand();
 		
@@ -94,7 +95,9 @@ public class GetMappingRate {
 		List<Rate> rates = getArticlesByCodeBrand();
 		List<Rates> rates2 = new ArrayList<>();
 		rates2.add(new Rates(rates));
-		brand.setHotel(getHotel());
+		
+		brand.setHotel(Util.getHotels());
+		
 		brand.setRates(rates2);
 		brand.setCode(Contants.CODIGODEMARCA);
 		brand.setLanguage(Contants.LENGUAJE);

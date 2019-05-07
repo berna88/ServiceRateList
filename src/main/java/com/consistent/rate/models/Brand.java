@@ -24,7 +24,7 @@ public class Brand {
 	 String channel;
 	 Medialinks medialinks;
 	 List<Rates> rates;
-	 Hotel hotel;
+	 List<Hotel> hotel;
 	/*
 	@XmlElement(name = "medialinks")
 	public Medialinks getMedialinks() {
@@ -36,11 +36,11 @@ public class Brand {
 	}
 	*/
 	@XmlElement(name = "hotel")
-	public Hotel getHotel() {
+	public List<Hotel> getHotel() {
 		return hotel;
 	}
 
-	public void setHotel(Hotel hotel) {
+	public void setHotel(List<Hotel> hotel) {
 		this.hotel = hotel;
 	}
 	
@@ -113,7 +113,7 @@ public class Brand {
 	
 	
 	public Brand(String guid, String code, String name, String title, String language, String keyword, String order,
-			String channel, Medialinks medialinks, List<Rates> rates, Hotel hotel) {
+			String channel, Medialinks medialinks, List<Rates> rates,List<Hotel> hotel) {
 		super();
 		this.guid = guid;
 		this.code = code;
@@ -139,7 +139,7 @@ public class Brand {
 		this.channel = "";
 		this.medialinks = new Medialinks();
 		this.rates = new ArrayList<Rates>();
-		this.hotel = new Hotel();
+		this.hotel = new ArrayList<Hotel>();
 	}
 
 }

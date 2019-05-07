@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.consistent.rate.constants.Contants;
+import com.consistent.rate.mapping.GetMappingHotel;
 import com.consistent.rate.mapping.RoomMapping;
 import com.consistent.rate.models.Rate;
+import com.consistent.rate.models.hotel.Hotel;
 import com.consistent.rate.models.hotel.MediaLink;
 import com.consistent.rate.models.hotel.MediaLinks;
 import com.consistent.rate.models.hotel.Multimedia;
@@ -66,47 +68,67 @@ public class Util {
 		return structure;
 	}
 	
-	public static String getStrunture(String name) throws PortalException{
-		log.info("Consulta Hoteles");
+	public static List<Hotel> getHotels() throws PortalException{
+		GetMappingHotel content = new GetMappingHotel();
+		Hotel mapping = new Hotel();
 		String structureKey = "";
 		Long parentFolderId = null;
 		Long folderId = null; 
-		List<JournalArticle> journalArray = new ArrayList<>();
-		DynamicQuery structureQuery = DDMStructureLocalServiceUtil.dynamicQuery().add(PropertyFactoryUtil.forName("name").like("%"+name+"%"));
-		List<DDMStructure> results = DDMStructureLocalServiceUtil.dynamicQuery(structureQuery);
-		structureKey = results.get(0).getStructureKey();
-		log.info(structureKey);
+		List<Hotel> hotels = new ArrayList<>();
 		
-		
-		DynamicQuery dynamicQueryFolder = DynamicQueryFactoryUtil.forClass(JournalFolderImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
-		dynamicQueryFolder.add(PropertyFactoryUtil.forName("name").eq("hotel"));
-		dynamicQueryFolder.add(PropertyFactoryUtil.forName("groupId").eq(Contants.SITE_ID));
-		List<JournalFolder> folders = JournalFolderLocalServiceUtil.dynamicQuery(dynamicQueryFolder);
-		parentFolderId = folders.get(0).getFolderId();
-		log.info(parentFolderId);
-		
-		
-		DynamicQuery dynamicQueryFolderId = DynamicQueryFactoryUtil.forClass(JournalFolderImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
-		dynamicQueryFolderId.add(PropertyFactoryUtil.forName("name").eq("ex"));
-		dynamicQueryFolderId.add(PropertyFactoryUtil.forName("groupId").eq(Contants.SITE_ID));
-		dynamicQueryFolderId.add(PropertyFactoryUtil.forName("parentFolderId").eq(parentFolderId));
-		List<JournalFolder> foldersId = JournalFolderLocalServiceUtil.dynamicQuery(dynamicQueryFolderId);
-		folderId = foldersId.get(0).getFolderId();
-		log.info(folderId);
-		
-		DynamicQuery dynamicQueryJournal = DynamicQueryFactoryUtil.forClass(JournalArticleImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
-		dynamicQueryJournal.add(PropertyFactoryUtil.forName("DDMStructureKey").eq(structureKey));
-		dynamicQueryJournal.add(PropertyFactoryUtil.forName("groupId").eq(new Long(Contants.SITE_ID)));
-		dynamicQueryJournal.add(PropertyFactoryUtil.forName("treePath").like("%"+folderId+"%"));
-		List<JournalArticle> journalArticles = JournalArticleLocalServiceUtil.dynamicQuery(dynamicQueryJournal);
-		for (JournalArticle journal : journalArticles) {
-			 if(JournalArticleLocalServiceUtil.isLatestVersion(Contants.SITE_ID, journal.getArticleId(), journal.getVersion(),WorkflowConstants.STATUS_APPROVED)==true){
-				 journalArray.add(journal);
-			   	}
+		try {
 			
+			DynamicQuery structureQuery = DDMStructureLocalServiceUtil.dynamicQuery().add(PropertyFactoryUtil.forName("name").like("%"+Contants.HOTEL_ESTRUCUTURA+"%"));
+			List<DDMStructure> results = DDMStructureLocalServiceUtil.dynamicQuery(structureQuery);
+			structureKey = results.get(0).getStructureKey();
+			log.info(structureKey);
+			
+			
+			DynamicQuery dynamicQueryFolder = DynamicQueryFactoryUtil.forClass(JournalFolderImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
+			dynamicQueryFolder.add(PropertyFactoryUtil.forName("name").eq("hotel"));
+			dynamicQueryFolder.add(PropertyFactoryUtil.forName("groupId").eq(Contants.SITE_ID));
+			List<JournalFolder> folders = JournalFolderLocalServiceUtil.dynamicQuery(dynamicQueryFolder);
+			parentFolderId = folders.get(0).getFolderId();
+			log.info(parentFolderId);
+			
+			
+			DynamicQuery dynamicQueryFolderId = DynamicQueryFactoryUtil.forClass(JournalFolderImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
+			log.info("Codigo de marca: "+Contants.CODIGODEMARCA.toLowerCase().toString());
+			dynamicQueryFolderId.add(PropertyFactoryUtil.forName("name").eq(Contants.CODIGODEMARCA.toLowerCase().toString()));
+			dynamicQueryFolderId.add(PropertyFactoryUtil.forName("groupId").eq(Contants.SITE_ID));
+			dynamicQueryFolderId.add(PropertyFactoryUtil.forName("parentFolderId").eq(parentFolderId));
+			List<JournalFolder> foldersId = JournalFolderLocalServiceUtil.dynamicQuery(dynamicQueryFolderId);
+			folderId = foldersId.get(0).getFolderId();
+			log.info(folderId);
+			
+			DynamicQuery dynamicQueryJournal = DynamicQueryFactoryUtil.forClass(JournalArticleImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
+			dynamicQueryJournal.add(PropertyFactoryUtil.forName("DDMStructureKey").eq(structureKey));
+			dynamicQueryJournal.add(PropertyFactoryUtil.forName("groupId").eq(new Long(Contants.SITE_ID)));
+			dynamicQueryJournal.add(PropertyFactoryUtil.forName("treePath").like("%"+folderId+"%"));
+			List<JournalArticle> journalArticles = JournalArticleLocalServiceUtil.dynamicQuery(dynamicQueryJournal);
+			for (JournalArticle journal : journalArticles) {
+				 if(JournalArticleLocalServiceUtil.isLatestVersion(Contants.SITE_ID, journal.getArticleId(), journal.getVersion(),WorkflowConstants.STATUS_APPROVED)==true){
+					 content.HotelContents(journal, Contants.getLanguaje());
+					 mapping = getHotelRooms(content,Contants.CODIGODEMARCA.toLowerCase().toString(),Contants.getLanguaje(),Contants.SITE_ID);
+					 if(Contants.CODIGODEHOTEL!=null){
+						 
+						 if(mapping.getCode().equalsIgnoreCase(Contants.CODIGODEHOTEL)){
+							 log.info("Codigo de hotel: "+mapping.getCode());
+							 hotels.add(mapping);
+						 }
+					 }else{
+						 hotels.add(mapping);
+					 }
+					 
+				   	}
+			}
+			log.info("Total de hoteles: "+hotels.size());
+		}  catch (IndexOutOfBoundsException ie) {
+			log.error("El nombre de la marca no es valida");
+			log.error("Causa: " + ie.getCause());
 		}
-		log.info("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"+journalArray.size());
-		return structureKey;
+		
+		return hotels;
 	}
 	
 	//Obteniendo la estructura por nombre
@@ -135,7 +157,7 @@ public class Util {
 		// Obteniendo los web content de rate por categorias
 		public static List<Rate> getWebContentRate(String[] codesSplit,String locale) throws PortalException{
 			log.info("<---------- Metodo getWebContentRate ---------->");
-			log.info("<------Nombre de la estructura: ----->"+getStrunture("hotel"));
+			log.info("<------Nombre de la estructura: ----->");
 			AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
 			List<Rate> rates = new ArrayList<Rate>();
 			Long categoryId = getCategory(Contants.CODIGODEMARCA);
@@ -144,7 +166,7 @@ public class Util {
 			List<AssetEntry> assetEntryList = AssetEntryLocalServiceUtil.getEntries(assetEntryQuery);
 			log.info("Size:"+assetEntryList.size());
 			Long structureId = getStructure();
-			List<JournalArticle> article = new ArrayList<JournalArticle>();
+			
 			
 			try {
 				for (AssetEntry ae : assetEntryList) {
@@ -479,7 +501,7 @@ public class Util {
 					}
 			  	
 			  	@SuppressWarnings("deprecation")
-				public com.consistent.rate.models.hotel.Hotel getHotelRooms(com.consistent.rate.mapping.GetMappingHotel content,String brand,String laguage,Long siteID) throws NumberFormatException, PortalException  {
+				public static com.consistent.rate.models.hotel.Hotel getHotelRooms(com.consistent.rate.mapping.GetMappingHotel content,String brand,String laguage,Long siteID) throws NumberFormatException, PortalException  {
 				 
 				    com.consistent.rate.models.hotel.Hotel hote= new com.consistent.rate.models.hotel.Hotel();
 					//hote.setBrandcode(brand);
@@ -639,7 +661,7 @@ public class Util {
 			}
 			  	
 			  	
-			  	public RoomMapping getJournalArticleByClassPkRoom(Long classPk,String laguage,Long siteID) throws PortalException{
+			  	public static RoomMapping getJournalArticleByClassPkRoom(Long classPk,String laguage,Long siteID) throws PortalException{
 					 com.consistent.rate.mapping.RoomMapping roomMapping = new com.consistent.rate.mapping.RoomMapping();
 					 DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(com.liferay.journal.model.impl.JournalArticleImpl.class, "journal",PortalClassLoaderUtil.getClassLoader());			
 					 dynamicQuery.add((PropertyFactoryUtil.forName("resourcePrimKey").eq(classPk)));

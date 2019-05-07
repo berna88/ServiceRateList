@@ -33,13 +33,13 @@ public class Contants {
 	public static List<String> FOLDERS;
 	
 	public static String NAME_STRUCTURE_DEFAULT;
+	//NOMBRE DE ESTRUCTURA
+	public static String HOTEL_ESTRUCUTURA = "hotel";
 	
 	public static String CHANNEL;
 	
 	//Metodo para obtener el locate
 		public static String getLanguaje(){
-			
-			log.info(LENGUAJE);
 			
 			if(LENGUAJE.equalsIgnoreCase("spanish")){
 			
