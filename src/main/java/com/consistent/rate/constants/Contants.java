@@ -18,6 +18,9 @@ public class Contants {
 	public static final String MARCAS = "Marcas";
 	// SITE ID
 	public static Long SITE_ID = null;
+	
+	
+	public static Long STRUCTUREID = null;
 	// NOMBRES DE CARPETAS
 	public static final String RATES = "rates";
 	public static final String HOTEL = "hotel";

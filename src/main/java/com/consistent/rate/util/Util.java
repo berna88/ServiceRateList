@@ -78,10 +78,11 @@ public class Util {
 		
 		try {
 			
-			DynamicQuery structureQuery = DDMStructureLocalServiceUtil.dynamicQuery().add(PropertyFactoryUtil.forName("name").like("%"+Contants.HOTEL_ESTRUCUTURA+"%"));
-			List<DDMStructure> results = DDMStructureLocalServiceUtil.dynamicQuery(structureQuery);
-			structureKey = results.get(0).getStructureKey();
-			log.info(structureKey);
+			//DynamicQuery structureQuery = DDMStructureLocalServiceUtil.dynamicQuery().add(PropertyFactoryUtil.forName("name").like("%"+Contants.HOTEL_ESTRUCUTURA+"%"));
+		     DDMStructure results = DDMStructureLocalServiceUtil.getStructure(Contants.STRUCTUREID);
+			log.info("Estructura"+results.getStructureKey());
+			
+			
 			
 			
 			DynamicQuery dynamicQueryFolder = DynamicQueryFactoryUtil.forClass(JournalFolderImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
@@ -92,17 +93,19 @@ public class Util {
 			log.info(parentFolderId);
 			
 			
-			DynamicQuery dynamicQueryFolderId = DynamicQueryFactoryUtil.forClass(JournalFolderImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
+			/*DynamicQuery dynamicQueryFolderId = DynamicQueryFactoryUtil.forClass(JournalFolderImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
 			log.info("Codigo de marca: "+Contants.CODIGODEMARCA.toLowerCase().toString());
 			dynamicQueryFolderId.add(PropertyFactoryUtil.forName("name").eq(Contants.CODIGODEMARCA.toLowerCase().toString()));
 			dynamicQueryFolderId.add(PropertyFactoryUtil.forName("groupId").eq(Contants.SITE_ID));
 			dynamicQueryFolderId.add(PropertyFactoryUtil.forName("parentFolderId").eq(parentFolderId));
 			List<JournalFolder> foldersId = JournalFolderLocalServiceUtil.dynamicQuery(dynamicQueryFolderId);
-			folderId = foldersId.get(0).getFolderId();
+			folderId = foldersId.get(0).getFolderId();*/
+			JournalFolder folder = JournalFolderLocalServiceUtil.fetchFolder(Contants.SITE_ID, parentFolderId, Contants.CODIGODEMARCA.toLowerCase().toString()); //.getFolders(Contants.SITE_ID,parentFolderId);
+			folderId = folder.getFolderId();
 			log.info(folderId);
 			
 			DynamicQuery dynamicQueryJournal = DynamicQueryFactoryUtil.forClass(JournalArticleImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
-			dynamicQueryJournal.add(PropertyFactoryUtil.forName("DDMStructureKey").eq(structureKey));
+			dynamicQueryJournal.add(PropertyFactoryUtil.forName("DDMStructureKey").eq(results.getStructureKey()));
 			dynamicQueryJournal.add(PropertyFactoryUtil.forName("groupId").eq(new Long(Contants.SITE_ID)));
 			dynamicQueryJournal.add(PropertyFactoryUtil.forName("treePath").like("%"+folderId+"%"));
 			List<JournalArticle> journalArticles = JournalArticleLocalServiceUtil.dynamicQuery(dynamicQueryJournal);

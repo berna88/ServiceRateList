@@ -15,5 +15,9 @@ public interface Otherconfig {
     
     @Meta.AD( deflt = "Hoteles", required = false,description = "Get name from structure search queries")
     public String NameDefaultStructure();
+    
+    
+    @Meta.AD( required = false,description = "Get name from structure search queries")
+    public Long idStructure();
 }
 

@@ -211,6 +211,14 @@ public class GetMappingRate {
 		_sampleRESTConfiguration = ConfigurableUtil.createConfigurable(Otherconfig.class, properties);
 		
 		if (_sampleRESTConfiguration != null) {
+			if(_sampleRESTConfiguration.idStructure()!=0){
+				Contants.STRUCTUREID =_sampleRESTConfiguration.idStructure();
+			}
+			else{
+				Contants.STRUCTUREID = new Long(94858);
+			}
+			
+			
 			if(_sampleRESTConfiguration.folderName()!= null && _sampleRESTConfiguration.folderName().size() > 0){
 				Contants.FOLDERS = _sampleRESTConfiguration.folderName();
 				log.info("For sample DXP REST config, info="+Contants.FOLDERS);
