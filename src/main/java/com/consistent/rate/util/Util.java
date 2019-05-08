@@ -71,7 +71,7 @@ public class Util {
 	public static List<Hotel> getHotels() throws PortalException{
 		GetMappingHotel content = new GetMappingHotel();
 		Hotel mapping = new Hotel();
-		String structureKey = "";
+		
 		Long parentFolderId = null;
 		Long folderId = null; 
 		List<Hotel> hotels = new ArrayList<>();
@@ -80,7 +80,7 @@ public class Util {
 			
 			//DynamicQuery structureQuery = DDMStructureLocalServiceUtil.dynamicQuery().add(PropertyFactoryUtil.forName("name").like("%"+Contants.HOTEL_ESTRUCUTURA+"%"));
 		     DDMStructure results = DDMStructureLocalServiceUtil.getStructure(Contants.STRUCTUREID);
-			log.info("Estructura"+results.getStructureKey());
+			log.info("Estructura: "+results.getStructureKey());
 			
 			
 			
@@ -89,8 +89,9 @@ public class Util {
 			dynamicQueryFolder.add(PropertyFactoryUtil.forName("name").eq("hotel"));
 			dynamicQueryFolder.add(PropertyFactoryUtil.forName("groupId").eq(Contants.SITE_ID));
 			List<JournalFolder> folders = JournalFolderLocalServiceUtil.dynamicQuery(dynamicQueryFolder);
+			
 			parentFolderId = folders.get(0).getFolderId();
-			log.info(parentFolderId);
+			log.info("Parent folder: "+parentFolderId);
 			
 			
 			/*DynamicQuery dynamicQueryFolderId = DynamicQueryFactoryUtil.forClass(JournalFolderImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
@@ -102,7 +103,7 @@ public class Util {
 			folderId = foldersId.get(0).getFolderId();*/
 			JournalFolder folder = JournalFolderLocalServiceUtil.fetchFolder(Contants.SITE_ID, parentFolderId, Contants.CODIGODEMARCA.toLowerCase().toString()); //.getFolders(Contants.SITE_ID,parentFolderId);
 			folderId = folder.getFolderId();
-			log.info(folderId);
+			log.info("Folder id: "+folderId);
 			
 			DynamicQuery dynamicQueryJournal = DynamicQueryFactoryUtil.forClass(JournalArticleImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
 			dynamicQueryJournal.add(PropertyFactoryUtil.forName("DDMStructureKey").eq(results.getStructureKey()));
@@ -110,20 +111,23 @@ public class Util {
 			dynamicQueryJournal.add(PropertyFactoryUtil.forName("treePath").like("%"+folderId+"%"));
 			List<JournalArticle> journalArticles = JournalArticleLocalServiceUtil.dynamicQuery(dynamicQueryJournal);
 			for (JournalArticle journal : journalArticles) {
-				 if(JournalArticleLocalServiceUtil.isLatestVersion(Contants.SITE_ID, journal.getArticleId(), journal.getVersion(),WorkflowConstants.STATUS_APPROVED)==true){
-					 content.HotelContents(journal, Contants.getLanguaje());
-					 mapping = getHotelRooms(content,Contants.CODIGODEMARCA.toLowerCase().toString(),Contants.getLanguaje(),Contants.SITE_ID);
-					 if(Contants.CODIGODEHOTEL!=null){
-						 
-						 if(mapping.getCode().equalsIgnoreCase(Contants.CODIGODEHOTEL)){
-							 log.info("Codigo de hotel: "+mapping.getCode());
+				if(!journal.isInTrash()){
+					if(JournalArticleLocalServiceUtil.isLatestVersion(Contants.SITE_ID, journal.getArticleId(), journal.getVersion(),WorkflowConstants.STATUS_APPROVED)){
+						 content.HotelContentsMapping(journal, Contants.getLanguaje());
+						 mapping = getHotelRooms(content,Contants.CODIGODEMARCA.toLowerCase().toString(),Contants.getLanguaje(),Contants.SITE_ID);
+						 if(Contants.CODIGODEHOTEL!=null){
+							 
+							 if(mapping.getCode().equalsIgnoreCase(Contants.CODIGODEHOTEL)){
+								 log.info("Codigo de hotel: "+mapping.getCode());
+								 hotels.add(mapping);
+							 }
+						 }else{
 							 hotels.add(mapping);
 						 }
-					 }else{
-						 hotels.add(mapping);
-					 }
-					 
-				   	}
+						 
+					   	}
+				}
+				 
 			}
 			log.info("Total de hoteles: "+hotels.size());
 		}  catch (IndexOutOfBoundsException ie) {

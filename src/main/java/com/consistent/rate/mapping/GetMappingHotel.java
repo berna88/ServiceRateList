@@ -36,7 +36,245 @@ public class GetMappingHotel {
 	private static final Log log = LogFactoryUtil.getLog(GetMappingHotel.class);  
     /*Converter maping with SAX*/
     public GetMappingHotel() {
-    } 
+    }
+    
+    
+    public void HotelContentsMapping(JournalArticle content, String locale) throws PortalException {
+    	this.articleId=content.getArticleId();
+        this.title=content.getTitle(locale); 
+        Document docXML=null;
+        try {
+			docXML = SAXReaderUtil.read(content.getContentByLocale(locale));			
+			this.hotelCode=docXML.valueOf("//dynamic-element[@name='codeHotel']/dynamic-content/text()");
+			this.travelClickCode=docXML.valueOf("//dynamic-element[@name='codeTravelClickHotel']/dynamic-content/text()");
+			this.name=docXML.valueOf("//dynamic-element[@name='nameHotel']/dynamic-content/text()");
+			this.description=docXML.valueOf("//dynamic-element[@name='descriptionHotel']/dynamic-content/text()");
+			this.shortDescription=docXML.valueOf("//dynamic-element[@name='shortDescriptionHotel']/dynamic-content/text()");
+			this.bepDescription=docXML.valueOf("//dynamic-element[@name='BEPDescription']/dynamic-content/text()");
+			this.corporateDescription=docXML.valueOf("//dynamic-element[@name='corpoRateDescription']/dynamic-content/text()");
+			this.roomDescription=docXML.valueOf("//dynamic-element[@name='descriptionRoomsHotel']/dynamic-content/text()");	
+			
+			List<Node> amenitiesNodes = docXML.selectNodes("//dynamic-element[@name='amenitiesHotel']/dynamic-element");		
+			
+			this.amenities=new ArrayList<String>();
+			for(Node amenitiesNode : amenitiesNodes){
+				String nombre= amenitiesNode.valueOf("@name");
+				String valor= amenitiesNode.valueOf("dynamic-content/text()");
+				if(nombre.equals("otherHotel") && !valor.trim().equals("")){
+					this.amenities.add(valor);
+				}else  if(valor.equals("true")){
+					this.amenities.add(nombre);
+				}				
+            }			
+			
+			List<Node> mediaNodes = docXML.selectNodes("//dynamic-element[@name='mediaLinksHotel']/dynamic-element");
+			List<String> mediaArray=new ArrayList<String>();
+			for(Node mediaNode : mediaNodes){				
+				String pie= mediaNode.valueOf("dynamic-element[@name='Pie']/dynamic-content/text()");				
+				String link= mediaNode.valueOf("dynamic-content/text()");				
+				String type_image= mediaNode.valueOf("dynamic-element[@name='typeHotel']/dynamic-content/text()");						
+				if(!link.trim().equals("")){
+					JSONObject object=JSONFactoryUtil.createJSONObject();
+					object.put("link", link);
+					object.put("pie", pie);
+					object.put("type_image", type_image);
+					mediaArray.add(object.toJSONString());
+				}	
+								
+            }
+			this.mediaLinks=sanitizeArray(mediaArray);
+			
+			
+			List<Node> roomLinkNodes = docXML.selectNodes("//dynamic-element[@name='roomLinksHotel']/dynamic-element");		
+			List<String> roomsArray=new ArrayList<String>();
+			for(Node roomLinkNode : roomLinkNodes){				
+				String valor= roomLinkNode.valueOf("dynamic-content/text()");
+				if(!valor.trim().equals("")){
+					JSONObject object=null;
+					try {
+						object=JSONFactoryUtil.createJSONObject(valor);
+					} catch (JSONException e) {
+						log.error("ERROR AL OBTENER JSON",e);
+					}					
+					roomsArray.add(object.toJSONString());
+				}			
+            }
+						
+			this.roomLinks=sanitizeArray(roomsArray);
+			
+			
+			List<Node> facilityLinkNodes = docXML.selectNodes("//dynamic-element[@name='facilityLinksHtotel']/dynamic-element");		
+			List<String> facilitiesArray=new ArrayList<String>();
+			for(Node facilityLinkNode : facilityLinkNodes){				
+				String valor= facilityLinkNode.valueOf("dynamic-content/text()");
+				if(!valor.trim().equals("")){
+					JSONObject object=null;
+					try {
+						object=JSONFactoryUtil.createJSONObject(valor);
+					} catch (JSONException e) {
+						log.error("Error get conversion json",e);
+					}					
+					facilitiesArray.add(object.toJSONString());
+				}			
+            }
+						
+			this.facilityLinks=sanitizeArray(facilitiesArray);
+			
+			List<Node> destinationLinkNodes = docXML.selectNodes("//dynamic-element[@name='destinationLinksHotel']/dynamic-element");		
+			List<String> destinationsArray=new ArrayList<String>();
+			for(Node destinationLinkNode : destinationLinkNodes){				
+				String valor= destinationLinkNode.valueOf("dynamic-content/text()");
+				if(!valor.trim().equals("")){
+					JSONObject object=null;
+					try {
+						object=JSONFactoryUtil.createJSONObject(valor);
+					} catch (JSONException e) {
+						log.error("Error get conversion json",e);
+					}					
+					destinationsArray.add(object.toJSONString());
+				}			
+            }
+								
+			this.destinationLinks=sanitizeArray(destinationsArray);
+			
+			
+			this.contact=docXML.valueOf("//dynamic-element[@name='contactHotel']/dynamic-content/text()");
+			
+			
+			List<Node> addressNodes = docXML.selectNodes("//dynamic-element[@name='addressHotel']/dynamic-element");
+			
+			for(Node addressNode : addressNodes){
+				String nombre= addressNode.valueOf("@name");
+				String valor= addressNode.valueOf("dynamic-content/text()");
+				if(nombre.equals("addressDetailHotel")){
+					this.address=valor;
+				}
+				if(nombre.equals("countryHotel")){
+					this.country=valor;
+				}
+				if(nombre.equals("stateHotel")){
+					this.state=valor;
+				}
+				if(nombre.equals("cityHotel")){
+					this.city=valor;
+				}
+				if(nombre.equals("zipHotel")){
+					this.zipCode=valor;
+				}
+				if(nombre.equals("latitudHotel")){
+					this.latitude=valor;
+				}
+				if(nombre.equals("longitudHotel")){
+					this.longitude=valor;
+				}
+				if(nombre.equals("referencesHotel")){
+					this.references=valor;
+				}
+				if(nombre.equals("directionsHotel")){
+					this.addresses=valor;
+				}
+            }
+			
+			List<Node> telefonoNodes = docXML.selectNodes("//dynamic-element[@name='telephoneHotel']/dynamic-element");		
+			List<String> telefonosArray=new ArrayList<String>();
+			for(Node telefonoNode : telefonoNodes){				
+				String valor= telefonoNode.valueOf("dynamic-content/text()");
+				if(!valor.trim().equals("")){					
+					telefonosArray.add(valor);
+				}			
+            }
+			
+			this.phones=sanitizeArray(telefonosArray);
+			List<Node> alternativeHotels = docXML.selectNodes("//dynamic-element[@name='hotelesAlternos']/dynamic-element");		
+			List<String> alternativeHotelsArray=new ArrayList<String>();
+			for(Node alternativeHotel : alternativeHotels){				
+				String valor= alternativeHotel.valueOf("dynamic-content");
+				if(!valor.trim().equals("") && !valor.trim().equals("{}")){
+					alternativeHotelsArray.add(valor);
+				}
+							
+            }
+			this.alternativeHotels=sanitizeArray(alternativeHotelsArray);
+			this.floors=docXML.valueOf("//dynamic-element[@name='floorsHotels']/dynamic-content/text()");
+			this.rooms=docXML.valueOf("//dynamic-element[@name='roomsHotels']/dynamic-content/text()");
+			this.elevators=docXML.valueOf("//dynamic-element[@name='elevatorsHotels']/dynamic-content/text()");
+			this.restaurants=docXML.valueOf("//dynamic-element[@name='restaurantsHotels']/dynamic-content/text()");
+			this.bars=docXML.valueOf("//dynamic-element[@name='barsHotels']/dynamic-content/text()");
+			this.swimmingPools=docXML.valueOf("//dynamic-element[@name='poolsHotels']/dynamic-content/text()");
+			this.stars=docXML.valueOf("//dynamic-element[@name='starRatingHotel']/dynamic-content/text()");
+			this.openingTime=docXML.valueOf("//dynamic-element[@name='openingDateHotels']/dynamic-content/text()");
+			this.closingTime=docXML.valueOf("//dynamic-element[@name='closingDateHotels']/dynamic-content/text()");
+			this.announcements=docXML.valueOf("//dynamic-element[@name='avisosHotels']/dynamic-content/text()");
+			this.announcementStartingTime=docXML.valueOf("//dynamic-element[@name='fechaInicioAvisoHotels']/dynamic-content/text()");
+			this.announcementFinishingTime=docXML.valueOf("//dynamic-element[@name='fechaFinAvisoHotels']/dynamic-content/text()");
+			this.checkIn=docXML.valueOf("//dynamic-element[@name='horaCheckinHotels']/dynamic-content/text()");
+			this.checkOut=docXML.valueOf("//dynamic-element[@name='horaCheckoutHotels']/dynamic-content/text()");
+			
+			
+			List<AssetCategory> categories = AssetCategoryLocalServiceUtil.getCategories(JournalArticle.class.getName(), content.getResourcePrimKey());
+			
+			List<String> citiesArray=new ArrayList<String>();
+			List<String> contentArray=new ArrayList<String>();
+			List<String> countryArray=new ArrayList<String>();
+			List<String> featuresArray=new ArrayList<String>();
+			List<String> marcasArray=new ArrayList<String>();
+			List<String> resortsArray=new ArrayList<String>();
+			List<String> servicesArray=new ArrayList<String>();
+			List<String> stateArray=new ArrayList<String>();
+			
+			for(AssetCategory category : categories){				
+				AssetVocabulary vocabulary=AssetVocabularyLocalServiceUtil.fetchAssetVocabulary(category.getVocabularyId());
+				if(vocabulary.getName().equals("Cities")){
+					citiesArray.add(category.getName());
+				}
+				if(vocabulary.getName().equals("Content Type")){
+					contentArray.add(category.getName());
+				}
+				if(vocabulary.getName().equals("Country")){
+					countryArray.add(category.getName());
+				}
+				if(vocabulary.getName().equals("Features Room")){
+					featuresArray.add(category.getName());
+				}
+				if(vocabulary.getName().equals("Marcas")){
+					marcasArray.add(category.getName());
+				}
+				if(vocabulary.getName().equals("Resorts")){
+					resortsArray.add(category.getName());
+				}
+				if(vocabulary.getName().equals("Services and Facilities")){
+					servicesArray.add(category.getName());
+				}
+				if(vocabulary.getName().equals("State")){
+					stateArray.add(category.getName());
+				}
+			}
+			
+			this.metaCities=sanitizeArrayString(citiesArray);						
+			this.metaContentType=sanitizeArrayString(contentArray);						
+			this.metaCountry=sanitizeArrayString(countryArray);
+			this.metaFeaturesRoom=sanitizeArrayString(featuresArray);
+			this.metaBrands=sanitizeArrayString(marcasArray);
+			this.metaResorts=sanitizeArrayString(resortsArray);
+			this.metaServFacilities=sanitizeArrayString(servicesArray);
+			this.metaState=sanitizeArrayString(stateArray);
+			
+			
+			String[] tags= AssetTagLocalServiceUtil.getTagNames(JournalArticle.class.getName(), content.getResourcePrimKey());
+			List<String> tagsArray=new ArrayList<String>();
+			for(String tag : tags){
+				tagsArray.add(tag);
+			}
+			this.metaTags=sanitizeArray(tagsArray);
+			
+			
+		} catch (DocumentException e) {
+			log.error("ERROR to get XML",e);
+		}
+    }
+
+    
+    
     public void HotelContents(JournalArticle content, String locale) throws PortalException {
     	this.articleId=content.getArticleId();
         this.title=content.getTitle(locale); 
