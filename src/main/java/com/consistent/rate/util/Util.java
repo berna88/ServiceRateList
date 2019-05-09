@@ -18,6 +18,7 @@ import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
+import com.liferay.dynamic.data.mapping.exception.NoSuchStructureException;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.journal.model.JournalArticle;
@@ -86,7 +87,7 @@ public class Util {
 			
 			
 			DynamicQuery dynamicQueryFolder = DynamicQueryFactoryUtil.forClass(JournalFolderImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
-			dynamicQueryFolder.add(PropertyFactoryUtil.forName("name").eq("hotel"));
+			dynamicQueryFolder.add(PropertyFactoryUtil.forName("name").eq("Hotel"));
 			dynamicQueryFolder.add(PropertyFactoryUtil.forName("groupId").eq(Contants.SITE_ID));
 			List<JournalFolder> folders = JournalFolderLocalServiceUtil.dynamicQuery(dynamicQueryFolder);
 			
@@ -131,8 +132,16 @@ public class Util {
 			}
 			log.info("Total de hoteles: "+hotels.size());
 		}  catch (IndexOutOfBoundsException ie) {
-			log.error("El nombre de la marca no es valida");
+			log.error("El nombre de la Marca o el nombre de la carpeta hotel no son validos");
 			log.error("Causa: " + ie.getCause());
+		} catch (NoSuchStructureException e) {
+			// TODO: handle exception
+			log.error("La estructura no existe");
+			log.error("Causa: " + e.getCause());
+		}catch (NullPointerException e) {
+			// TODO: handle exception
+			log.error("El nombre de la Marca");
+			log.error("Causa: " + e.getCause());
 		}
 		
 		return hotels;

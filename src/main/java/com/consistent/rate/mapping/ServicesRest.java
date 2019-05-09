@@ -84,8 +84,4 @@ public class ServicesRest {
 		log.info("<-------- Proceso finalizado --------->");
 		return xml;
 	}
-	
-	
-	
-	
 }
