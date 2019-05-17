@@ -8,8 +8,9 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+
 public class MarcaMapping implements Mapping{
-	
+	//private static final Log log = LogFactoryUtil.getLog(MarcaMapping.class);
 	protected String guid;
 	protected String code;
 	protected String name;
@@ -125,11 +126,9 @@ public class MarcaMapping implements Mapping{
 
 	@Override
 	public String getMapping() throws XMLStreamException, IOException {
-		
 		StringWriter stringWriter = new StringWriter();
 		XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
 		XMLStreamWriter xMLStreamWriter = xmlOutputFactory.createXMLStreamWriter(stringWriter);
-		
 		xMLStreamWriter.writeStartDocument();
 			xMLStreamWriter.writeStartElement("contents");
 				xMLStreamWriter.writeStartElement("content");
@@ -159,18 +158,21 @@ public class MarcaMapping implements Mapping{
 							xMLStreamWriter.writeCharacters(channel);
 						xMLStreamWriter.writeEndElement();
 						xMLStreamWriter.writeStartElement("rates");
+				
 							for (RateMapping rateMappingR : rateMapping) {
 								xMLStreamWriter.writeCharacters(rateMappingR.getMapping());
 							}
-						xMLStreamWriter.writeEndElement();
-					xMLStreamWriter.writeEndDocument();
-				xMLStreamWriter.writeEndDocument();
-			xMLStreamWriter.writeEndDocument();
+						xMLStreamWriter.writeEndElement();//rates
+					xMLStreamWriter.writeEndElement();//brand
+				xMLStreamWriter.writeEndElement();//content
+			xMLStreamWriter.writeEndElement();//contents
+		xMLStreamWriter.writeEndDocument();
 		xMLStreamWriter.flush();
 		xMLStreamWriter.close();
 		String result = stringWriter.getBuffer().toString();
+		result = result.replace("&lt;", "<").replace("&gt;", ">");
 		stringWriter.close(); 
-		System.out.println(result);
+		//log.info(result);
 		return result;
 	}
 

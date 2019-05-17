@@ -2,13 +2,31 @@ package com.consistent.rate.sax;
 
 import java.io.IOException;
 import java.io.StringWriter;
-
+import java.util.HashSet;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-public class RateMapping extends MarcaMapping implements Mapping{
+import com.consistent.rate.constants.Contants;
+import com.consistent.rate.models.Rate;
+import com.consistent.rate.singleton.Portal;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
+import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
+import com.liferay.journal.model.JournalArticle;
+import com.liferay.journal.model.JournalArticleResource;
+import com.liferay.journal.service.JournalArticleLocalServiceUtil;
+import com.liferay.journal.service.JournalArticleResourceLocalServiceUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
+
+public class RateMapping extends Portal implements Mapping{
+	private static final Log log = LogFactoryUtil.getLog(RateMapping.class);
+	
 	private String guid;
 	private String code;
 	private String name;
@@ -302,4 +320,81 @@ public class RateMapping extends MarcaMapping implements Mapping{
 		return result;
 	}
 
+	
+	public HashSet<RateMapping> getWebContentRate(String locale) throws PortalException{
+		log.info("<---------- Metodo getWebContentRate Sin contrato---------->");
+		AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
+		//Coleccion donde se van a guardar lista de rates
+		final HashSet<RateMapping> rates = new HashSet<RateMapping>();
+		Long categoryId = getCategory(Contants.CODIGODEMARCA);
+		assetEntryQuery.setAnyCategoryIds(new long[] { categoryId });
+		assetEntryQuery.setClassName("com.liferay.journal.model.JournalArticle");
+		final HashSet<AssetEntry> assetEntryList = new HashSet<AssetEntry>(AssetEntryLocalServiceUtil.getEntries(assetEntryQuery)) ;
+		log.info("Tamaño de elemento por categorias: "+assetEntryList.size());
+		RateMapping mapping;
+		try {
+			final Long startHashSetTime = System.currentTimeMillis();
+			
+			for (AssetEntry ae : assetEntryList) {
+			    JournalArticleResource journalArticleResource = JournalArticleResourceLocalServiceUtil.getJournalArticleResource(ae.getClassPK());
+			    JournalArticle journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleResource.getResourcePrimKey());
+			    
+			    if(journalArticle.getGroupId() == Contants.SITE_ID){
+			    	if(journalArticle.getDDMStructure().getStructureId() == Contants.STRUCTURE_RATE_ID){
+			    				
+								//article.add(journalArticle);
+								final Rate rate = new Rate();
+								rate.setTitle(journalArticle.getTitle(locale));
+								Document document = null;
+								
+								document = SAXReaderUtil.read(journalArticle.getContentByLocale(locale));
+
+									mapping = new RateMapping("", document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"), "", Contants.LENGUAJE, document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"), Mapping.order, Mapping.channel, document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()")); 
+									/*rate.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
+									rate.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
+									rate.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
+									rate.setDescription(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
+									rate.setShortDescription(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
+									rate.setBenefits(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
+									rate.setRestrictions(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
+									rate.setCurrency(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
+									rate.setEnddate(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
+									rate.setGuid(journalArticle.getArticleId());
+									rate.setLanguage(Contants.LENGUAJE);
+									rate.setChannel("www");
+									rate.setOrder("0");
+									
+									List<Multimedia> multimedia = new ArrayList<>();
+									Multimedia multi = new Multimedia();
+									multi.setUrl(document.valueOf("//dynamic-element[@name='mediaLinkRate']/dynamic-content/text()"));
+									multi.setType("icon");
+									multimedia.add(multi);
+									
+									List<MediaLink> medialink = new ArrayList<>();
+									MediaLink link = new MediaLink();
+									link.setKeyword("rate_icon");
+									link.setType("image");
+									link.setMultimedia(multimedia);
+									medialink.add(link);
+									
+									List<MediaLinks> mediaLinks = new ArrayList<>();
+									MediaLinks links = new MediaLinks();
+									links.setMedialinks(medialink);
+									mediaLinks.add(links);
+									rate.setMediaLinks(mediaLinks);
+									rates.add(rate);*/
+									rates.add(mapping);
+						
+				   // article.add(journalArticle);
+				    }
+			    }
+			}
+			final Long endHashSetTime = System.currentTimeMillis();
+			log.info("Tiempo de conversion en segundos de rate: " + (endHashSetTime - startHashSetTime)/1000);
+		} catch (Exception e) {
+			log.error("module getWebContentRate: "+e);
+		}
+		return rates;
+		
+	}
 }

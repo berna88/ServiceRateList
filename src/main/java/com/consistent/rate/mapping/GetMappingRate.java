@@ -1,9 +1,13 @@
 package com.consistent.rate.mapping;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.stream.XMLStreamException;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -17,14 +21,14 @@ import com.consistent.rate.models.Content;
 import com.consistent.rate.models.Contents;
 import com.consistent.rate.models.Rate;
 import com.consistent.rate.models.Rates;
-import com.consistent.rate.models.hotel.MediaLinks;
 import com.consistent.rate.models.hotel.Hotel;
 import com.consistent.rate.models.hotel.MediaLink;
+import com.consistent.rate.models.hotel.MediaLinks;
 import com.consistent.rate.models.hotel.Multimedia;
-import com.consistent.rate.models.room.room;
-import com.consistent.rate.models.room.rooms;
+import com.consistent.rate.sax.Mapping;
+import com.consistent.rate.sax.MarcaMapping;
+import com.consistent.rate.sax.RateMapping;
 import com.consistent.rate.util.Util;
-
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -32,7 +36,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
-import com.thoughtworks.xstream.XStream;
 
 
 @Component(
@@ -42,18 +45,18 @@ import com.thoughtworks.xstream.XStream;
 		property={"jaxrs.application=true"})
 public class GetMappingRate {
 	private static final Log log = LogFactoryUtil.getLog(GetMappingRate.class);
-	com.consistent.rate.util.Util _util_rate=  new Util();
+	RateMapping _util_rate=  new RateMapping();
 	
 	
 		// Metodo que filtra por codigo
-		public List<Rate> getArticlesByCodeBrand() throws PortalException{
+		public HashSet<RateMapping> getArticlesByCodeBrand() throws PortalException{
 			
 			//List<JournalArticle> articlesFilterCategories = Util.getWebContentRate();// Obtiene los datos ya filtrados por query
 			
 			//List<JournalArticle> articlesFilterContract = new ArrayList<JournalArticle>();
 			
 			
-			List<Rate> rates = new ArrayList<>();
+			HashSet<RateMapping> rates = new HashSet<>();
 			
 			String locale = Contants.getLanguaje();// Contiene el lenguaje
 			
@@ -65,7 +68,7 @@ public class GetMappingRate {
 				Contants.CONTRACTCODES = "";// se restablece el valor
 				System.out.println("Con contratos");
 				String[] codesSplit = codes.split(",");
-				rates = Util.getWebContentRate(codesSplit,locale);
+				//rates = Util.getWebContentRate(codesSplit,locale);
 				/*for(JournalArticle a:articlesFilterCategories){
 					
 					for(int i = 0; i < codesSplit.length;i++)
@@ -77,14 +80,14 @@ public class GetMappingRate {
 				*/
 				//rates = RatesContents(articlesFilterCategories, locale);
 			}else{
-				rates = Util.getWebContentRate(locale);
-				System.out.println("Sin contratos");
+				rates = _util_rate.getWebContentRate(locale);
+				log.info("Sin contratos");
 			}
 			return rates;
 		}
 	
 	
-	public final Contents getXML() throws PortalException{
+	public final String getXML() throws PortalException, XMLStreamException, IOException{
 		String nameBrand = Contants.getNameBrand(Contants.CODIGODEMARCA);
 		
 		
@@ -92,9 +95,10 @@ public class GetMappingRate {
 		Brand brand = new Brand();
 		
 		// Se iteran los rates para la inserción en marca
-		List<Rate> rates = getArticlesByCodeBrand();
+		HashSet<RateMapping> rates = getArticlesByCodeBrand();
+		Mapping mapping = new MarcaMapping("", "", "", "", "", rates);
 		List<Rates> rates2 = new ArrayList<>();
-		rates2.add(new Rates(rates));
+		//rates2.add(new Rates(rates));
 		
 		brand.setHotel(Util.getHotels());
 		
@@ -109,24 +113,22 @@ public class GetMappingRate {
 		content.add(new Content(brand));
 		final Contents contents = new Contents();
 		contents.setContent(content);
-		return contents;
+		return mapping.getMapping();
 	
 	}
-	
+	/*
 	public Hotel getHotel() throws PortalException{
-		long id_base= _util_rate.getFolderBaseByConfiguration(Contants.SITE_ID);
-        long id_brand = _util_rate.journalRootFolder(id_base,Contants.CODIGODEMARCA.toUpperCase(),Contants.SITE_ID);
+		long base=Contants.FOLDER_ID;
+        long id_brand = _util_rate.journalByCodeFolder(base,Contants.CODIGODEMARCA.toUpperCase(),Contants.SITE_ID);
         Long ids=_util_rate.journalByCodeFolder(id_brand,Contants.CODIGODEHOTEL,Contants.SITE_ID);
         if(!ids.equals(id_brand)){
         	return _util_rate.getJournalArticleByFolderId(ids,Contants.CODIGODEMARCA.toUpperCase(),Contants.getLanguaje() ,Contants.SITE_ID);
         }else{
         	return new com.consistent.rate.models.hotel.Hotel();
         }
-	}
+	}*/
 	
 
-	
-	
 	public final List<Rate> RatesContents(List<JournalArticle> articles, String locale) throws PortalException {
 		log.info("<------ Metodo RatesContents ------>");
 		List<Rate> rates = new ArrayList<Rate>();
@@ -205,47 +207,38 @@ public class GetMappingRate {
 	@Activate
 	@Modified
 	public void activate(Map<String, Object> properties) {
-	
-		System.out.println("The sample DXP REST app has been activated/updated at " + new Date().toString());
-  
-		_sampleRESTConfiguration = ConfigurableUtil.createConfigurable(Otherconfig.class, properties);
-		
-		if (_sampleRESTConfiguration != null) {
-			if(_sampleRESTConfiguration.idStructure()!=0){
-				Contants.STRUCTUREID =_sampleRESTConfiguration.idStructure();
-				log.info("For sample DXP REST config, info="+Contants.STRUCTUREID);
+				log.info("Se ha cardo la configuracion del portal " + new Date().toString());
+				_restConfigurationApi = ConfigurableUtil.createConfigurable(Otherconfig.class, properties);
+				
+		if (_restConfigurationApi != null) {
+			if(_restConfigurationApi.structureHotelId()!=0){
+				Contants.STRUCTURE_HOTEL_ID =_restConfigurationApi.structureHotelId();
+				log.info("Estructura de hotel localizada="+Contants.STRUCTURE_HOTEL_ID);
 			}
 			else{
-				Contants.STRUCTUREID = new Long(1516944);
-				log.info("For sample DXP REST config, info="+Contants.STRUCTUREID);
+				Contants.STRUCTURE_HOTEL_ID = new Long(1516944);
+				log.info("For sample DXP REST config, info="+Contants.STRUCTURE_HOTEL_ID);
 			}
-			
-			
-			if(_sampleRESTConfiguration.folderName()!= null && _sampleRESTConfiguration.folderName().size() > 0){
-				Contants.FOLDERS = _sampleRESTConfiguration.folderName();
-				log.info("For sample DXP REST config, info="+Contants.FOLDERS);
-		
-			}else {
-				Contants.FOLDERS = new ArrayList<>();
-				Contants.FOLDERS.add("Posadas");
-				Contants.FOLDERS.add("Hotel");
-				log.info("For sample DXP REST config, info="+Contants.FOLDERS);
-				
+			if(_restConfigurationApi.structureRatesId()!=0){
+				Contants.STRUCTURE_RATE_ID =_restConfigurationApi.structureRatesId();
+				log.info("For sample DXP REST config, info="+Contants.STRUCTURE_RATE_ID);
 			}
-			if(_sampleRESTConfiguration.NameDefaultStructure()!= null && !_sampleRESTConfiguration.NameDefaultStructure().isEmpty()){
-				Contants.NAME_STRUCTURE_DEFAULT = _sampleRESTConfiguration.NameDefaultStructure();
-				log.info("For sample DXP REST config, info="+Contants.NAME_STRUCTURE_DEFAULT);
-		
-			}else {
-				Contants.NAME_STRUCTURE_DEFAULT ="Hoteles";
-				log.info("For sample DXP REST config, info="+Contants.NAME_STRUCTURE_DEFAULT);
+			else{
+				Contants.STRUCTURE_RATE_ID = new Long(1516944);
+				log.info("For sample DXP REST config, info="+Contants.STRUCTURE_RATE_ID);
 			}
-			
+			if(_restConfigurationApi.folderId()!=0){
+				Contants.FOLDER_ID =_restConfigurationApi.folderId();
+				log.info("For sample DXP REST config, info="+Contants.FOLDER_ID);
+			}
+			else{
+				Contants.FOLDER_ID = new Long(1516944);
+				log.info("For sample DXP REST config, info="+Contants.FOLDER_ID);
+			}
 			} else {
 			System.out.println("The sample DXP REST config object is not yet initialized");
 		}
 	}
-	
-	
-	private Otherconfig _sampleRESTConfiguration;
+
+	private Otherconfig _restConfigurationApi;
 }

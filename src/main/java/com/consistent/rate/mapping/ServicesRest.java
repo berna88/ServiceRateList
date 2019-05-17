@@ -1,6 +1,7 @@
 package com.consistent.rate.mapping;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -28,7 +29,7 @@ public class ServicesRest {
 	@GET
 	@Path("/getHotelRoomRates")
 	@Produces(MediaType.APPLICATION_XML)
-	public Contents getRate(
+	public String getRate(
 			@QueryParam("siteID") String siteID,
 			@QueryParam("brandcode") String brandcode,
 			@QueryParam("language") String languaje,
@@ -50,7 +51,7 @@ public class ServicesRest {
 		//Estableciendo canal
 		Contants.CHANNEL = channel;
 		
-		Contents xml = _rates.getXML();
+		String xml = _rates.getXML();
 		log.info("<-------- Proceso finalizado getHotelRoomRates--------->");
 		return xml;
 	}
@@ -58,7 +59,7 @@ public class ServicesRest {
 	@GET
 	@Path("/getHotelRoomRatesOptimizado")
 	@Produces(MediaType.APPLICATION_XML)
-	public Contents getRatesOptimizado(
+	public String getRatesOptimizado(
 			@QueryParam("siteID") String siteID,
 			@QueryParam("brandcode") String brandcode,
 			@QueryParam("language") String languaje,
@@ -86,7 +87,7 @@ public class ServicesRest {
 		Contants.CHECKINDATE = checkindate;
 		Contants.CHECKOUTDATE = checkoutdate;
 		
-		Contents xml = _rates.getXML();
+		String xml = _rates.getXML();
 		log.info("<-------- Proceso finalizado --------->");
 		return xml;
 	}

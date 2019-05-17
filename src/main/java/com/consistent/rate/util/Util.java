@@ -1,11 +1,10 @@
 package com.consistent.rate.util;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import org.joda.time.DateTime;
-import org.joda.time.Days;
 import org.joda.time.Interval;
 
 import com.consistent.rate.constants.Contants;
@@ -16,12 +15,13 @@ import com.consistent.rate.models.hotel.Hotel;
 import com.consistent.rate.models.hotel.MediaLink;
 import com.consistent.rate.models.hotel.MediaLinks;
 import com.consistent.rate.models.hotel.Multimedia;
+import com.consistent.rate.sax.Mapping;
+import com.consistent.rate.sax.RateMapping;
+import com.consistent.rate.singleton.Portal;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetEntry;
-import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
-import com.liferay.asset.kernel.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
 import com.liferay.dynamic.data.mapping.exception.NoSuchStructureException;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
@@ -30,7 +30,6 @@ import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleResource;
 import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.model.impl.JournalArticleImpl;
-import com.liferay.journal.model.impl.JournalFolderImpl;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.service.JournalArticleResourceLocalServiceUtil;
 import com.liferay.journal.service.JournalFolderLocalServiceUtil;
@@ -51,67 +50,25 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
-public class Util {
+public class Util extends Portal{
 	private static final Log log = LogFactoryUtil.getLog(Util.class);
 	static String marca = "";
 	
-	// Obteniendo id de la estructura
-	public static Long getStructure(){
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(JournalArticleImpl.class,"structure", PortalClassLoaderUtil.getClassLoader());
-		Long structure = null;
-		try {
-			List<JournalArticle> articles = JournalArticleLocalServiceUtil.dynamicQuery(dynamicQuery);
-			Long foldrId = getIdFolder(Contants.RATES);
-			for(JournalArticle article : articles){
-					if(article.getFolderId() == foldrId){
-						structure = article.getDDMStructure().getStructureId();
-					}
-			}
-			
-		} catch (Exception e) {
-			log.error("Error al obtener estructura: "+e.getMessage());
-		}
-		return structure;
-	}
 	
+	//Obtener Hoteles
 	public static List<Hotel> getHotels() throws PortalException{
 		GetMappingHotel content = new GetMappingHotel();
 		Hotel mapping = new Hotel();
 		
-		Long parentFolderId = null;
-		Long folderId = null; 
 		List<Hotel> hotels = new ArrayList<>();
 		
 		try {
 			
-			//DynamicQuery structureQuery = DDMStructureLocalServiceUtil.dynamicQuery().add(PropertyFactoryUtil.forName("name").like("%"+Contants.HOTEL_ESTRUCUTURA+"%"));
-		    DDMStructure results = DDMStructureLocalServiceUtil.getStructure(Contants.STRUCTUREID);
+		    DDMStructure results = DDMStructureLocalServiceUtil.getStructure(Contants.STRUCTURE_HOTEL_ID);
 			log.info("Estructura: "+results.getStructureKey());
-			 
-			
-			
-			
-			DynamicQuery dynamicQueryFolder = DynamicQueryFactoryUtil.forClass(JournalFolderImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
-			dynamicQueryFolder.add(PropertyFactoryUtil.forName("name").eq(Contants.FOLDERS.get(1)));
-			dynamicQueryFolder.add(PropertyFactoryUtil.forName("groupId").eq(Contants.SITE_ID));
-			List<JournalFolder> folders = JournalFolderLocalServiceUtil.dynamicQuery(dynamicQueryFolder);
-			
-			parentFolderId = folders.get(0).getFolderId();
-			log.info("Tamaño para obtener el folder de Hotel: "+folders.size());
-			log.info("Parent folder: "+parentFolderId);
-			
-			
-			/*DynamicQuery dynamicQueryFolderId = DynamicQueryFactoryUtil.forClass(JournalFolderImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
-			log.info("Codigo de marca: "+Contants.CODIGODEMARCA.toLowerCase().toString());
-			dynamicQueryFolderId.add(PropertyFactoryUtil.forName("name").eq(Contants.CODIGODEMARCA.toLowerCase().toString()));
-			dynamicQueryFolderId.add(PropertyFactoryUtil.forName("groupId").eq(Contants.SITE_ID));
-			dynamicQueryFolderId.add(PropertyFactoryUtil.forName("parentFolderId").eq(parentFolderId));
-			List<JournalFolder> foldersId = JournalFolderLocalServiceUtil.dynamicQuery(dynamicQueryFolderId);
-			folderId = foldersId.get(0).getFolderId();*/
-			JournalFolder folder = JournalFolderLocalServiceUtil.fetchFolder(Contants.SITE_ID, parentFolderId, Contants.CODIGODEMARCA); //.getFolders(Contants.SITE_ID,parentFolderId);
-			folderId = folder.getFolderId();
+			JournalFolder folder = JournalFolderLocalServiceUtil.fetchFolder(Contants.SITE_ID, Contants.FOLDER_ID, Contants.CODIGODEMARCA);
+			long folderId = folder.getFolderId();
 			log.info("Folder id: "+folderId);
-			
 			DynamicQuery dynamicQueryJournal = DynamicQueryFactoryUtil.forClass(JournalArticleImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
 			dynamicQueryJournal.add(PropertyFactoryUtil.forName("DDMStructureKey").eq(results.getStructureKey()));
 			dynamicQueryJournal.add(PropertyFactoryUtil.forName("groupId").eq(new Long(Contants.SITE_ID)));
@@ -142,11 +99,9 @@ public class Util {
 			log.error("Causa: " + ie.getCause());
 			ie.fillInStackTrace();
 		} catch (NoSuchStructureException e) {
-			// TODO: handle exception
 			log.error("La estructura no existe");
 			log.error("Causa: " + e.getCause());
 		}catch (NullPointerException e) {
-			// TODO: handle exception
 			log.error("El nombre de la Marca");
 			log.error("Causa: " + e.getCause());
 		}
@@ -154,31 +109,9 @@ public class Util {
 		return hotels;
 	}
 	
-	//Obteniendo la estructura por nombre
-	public static Long getIdFolder(String carpeta){
-		log.info("<---------- Metodo getIdFolder ---------->");
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(JournalFolderImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
-		Long idFolder = null;
-		try {
-			List<JournalFolder> folders = JournalFolderLocalServiceUtil.dynamicQuery(dynamicQuery);
-			for(JournalFolder folder : folders){
-				if(folder.getGroupId() == Contants.SITE_ID){
-					if(folder.getName().equalsIgnoreCase(carpeta)){
-						 idFolder = folder.getFolderId();
-						 log.info("Nombre del folder: "+folder.getName());
-					}
-				}
-			}
-		} catch (Exception e) {
-			log.error("module getIdFolder: "+e);
-		}
-		return idFolder;
-	}
-	
-	
 		
 		// Obteniendo los web content de rate por categorias
-		public static List<Rate> getWebContentRate(String[] codesSplit,String locale) throws PortalException{
+		public List<Rate> getWebContentRate(String[] codesSplit,String locale) throws PortalException{
 			log.info("<---------- Metodo getWebContentRate ---------->");
 			log.info("<------Nombre de la estructura: ----->");
 			AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
@@ -188,16 +121,13 @@ public class Util {
 			assetEntryQuery.setClassName("com.liferay.journal.model.JournalArticle");
 			List<AssetEntry> assetEntryList = AssetEntryLocalServiceUtil.getEntries(assetEntryQuery);
 			log.info("Tamaño:"+assetEntryList.size());
-			Long structureId = getStructure();
-			
-			
 			try {
 				for (AssetEntry ae : assetEntryList) {
 					//System.out.println(ae.getClassName() + " = "+ae.getClassNameId());
 				    JournalArticleResource journalArticleResource = JournalArticleResourceLocalServiceUtil.getJournalArticleResource(ae.getClassPK());
 				    JournalArticle journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleResource.getResourcePrimKey());
 				    if(journalArticle.getGroupId() == Contants.SITE_ID){
-				    	if(journalArticle.getDDMStructure().getStructureId() == structureId){
+				    	if(journalArticle.getDDMStructure().getStructureId() == Contants.STRUCTURE_RATE_ID){
 				    		for(int i = 0; i < codesSplit.length;i++)
 							{
 								if(journalArticle.getContent().contains(codesSplit[i]))
@@ -255,39 +185,35 @@ public class Util {
 			
 		}
 		
-		
-		public static List<Rate> getWebContentRate(String locale) throws PortalException{
+	/*	
+		public HashSet<RateMapping> getWebContentRate(String locale) throws PortalException{
 			log.info("<---------- Metodo getWebContentRate Sin contrato---------->");
 			AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
-			List<Rate> rates = new ArrayList<Rate>();
+			final HashSet<RateMapping> rates = new HashSet<RateMapping>();
 			Long categoryId = getCategory(Contants.CODIGODEMARCA);
 			assetEntryQuery.setAnyCategoryIds(new long[] { categoryId });
 			assetEntryQuery.setClassName("com.liferay.journal.model.JournalArticle");
-	
-			List<AssetEntry> assetEntryList = AssetEntryLocalServiceUtil.getEntries(assetEntryQuery);
-			log.info("Size:"+assetEntryList.size());
-			Long structureId = getStructure();
+			final HashSet<AssetEntry> assetEntryList = new HashSet<AssetEntry>(AssetEntryLocalServiceUtil.getEntries(assetEntryQuery)) ;
+			log.info("Tamaño de elemento por categorias: "+assetEntryList.size());
 			int count = 0;
+			RateMapping mapping;
 			try {
+				final Long startHashSetTime = System.currentTimeMillis();
 				for (AssetEntry ae : assetEntryList) {
-					//System.out.println(ae.getClassName() + " = "+ae.getClassNameId());
 				    JournalArticleResource journalArticleResource = JournalArticleResourceLocalServiceUtil.getJournalArticleResource(ae.getClassPK());
 				    JournalArticle journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleResource.getResourcePrimKey());
 				    if(journalArticle.getGroupId() == Contants.SITE_ID){
-				    	if(journalArticle.getDDMStructure().getStructureId() == structureId){
+				    	if(journalArticle.getDDMStructure().getStructureId() == Contants.STRUCTURE_RATE_ID){
 				    				
 									//article.add(journalArticle);
 									final Rate rate = new Rate();
 									rate.setTitle(journalArticle.getTitle(locale));
 									Document document = null;
 									
-									
-									
 									document = SAXReaderUtil.read(journalArticle.getContentByLocale(locale));
 									
-									
-									if(getIntervals(Contants.CHECKINDATE, Contants.CHECKOUTDATE, document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"))){
 										count++;
+										mapping = new RateMapping("", document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"), "", Contants.LENGUAJE, document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"), Mapping.order, Mapping.channel, document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()")); 
 										rate.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
 										rate.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
 										rate.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
@@ -321,16 +247,15 @@ public class Util {
 										mediaLinks.add(links);
 										rate.setMediaLinks(mediaLinks);
 										rates.add(rate);
-									}
-									
-								   
-								 
+										rates.add(mapping);
 							
 					   // article.add(journalArticle);
 					    }
 				    }
 				}
-				log.info(count);
+				final Long endHashSetTime = System.currentTimeMillis();
+				log.info("Tiempo de conversion en segundos: " + (endHashSetTime - startHashSetTime)/1000);
+				log.info("Filtrados por fecha: " + count);
 			} catch (Exception e) {
 				log.error("module getWebContentRate: "+e);
 			}
@@ -338,85 +263,11 @@ public class Util {
 			
 		}
 		
+		*/
 		
-		// Obteniendo los web content de rate por categorias
-		public static List<JournalArticle> getWebContentRate() throws PortalException{
-			log.info("<---------- Metodo getWebContentRate ---------->");
-			AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
-			Long categoryId = getCategory(Contants.CODIGODEMARCA);
-			assetEntryQuery.setAnyCategoryIds(new long[] { categoryId });
-			assetEntryQuery.setClassName("com.liferay.journal.model.JournalArticle");
-			List<AssetEntry> assetEntryList = AssetEntryLocalServiceUtil.getEntries(assetEntryQuery);
-			log.info("Size:"+assetEntryList.size());
-			Long structureId = getStructure();
-			List<JournalArticle> article = new ArrayList<JournalArticle>();
-			try {
-				for (AssetEntry ae : assetEntryList) {
-				    JournalArticleResource journalArticleResource = JournalArticleResourceLocalServiceUtil.getJournalArticleResource(ae.getClassPK());
-				    JournalArticle journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleResource.getResourcePrimKey());
-				    if(journalArticle.getGroupId() == Contants.SITE_ID){
-				    	if(journalArticle.getDDMStructure().getStructureId() == structureId){
-				    		
-					    article.add(journalArticle);
-					    }
-				    }
-				}
-			} catch (Exception e) {
-				log.error("module getWebContentRate: "+e);
-			}
-			return article;
-			
-		}
-		
-		// Metodo obtiene el id del vocabulario
-		public static Long getVocabularyId(String nombre){
-			DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(AssetVocabulary.class, "Vocabulary", PortalClassLoaderUtil.getClassLoader());
-			Long vocabularyId = null;
-			try {
-				List<AssetVocabulary> vocabularies = AssetVocabularyLocalServiceUtil.dynamicQuery(dynamicQuery);
-				for(AssetVocabulary vocabulary: vocabularies){
-					if(vocabulary.getGroupId() == Contants.SITE_ID){
-						if(vocabulary.getName().equalsIgnoreCase(nombre)){
-							vocabularyId = vocabulary.getVocabularyId();
-							log.info("Nombre de vocabulary: "+vocabulary.getName() + " y Vocabulary id: " + vocabulary.getVocabularyId());
-						}
-					}
-				}
-			} catch (Exception e) {
-				log.error("Error en metodo getVocabularyId: "+ e.getMessage());
-			}
-			return vocabularyId;
-		}
-		
-		// Obteniendo la categoria id
-				public static Long getCategory(String marca){
-					log.info("<---------- Metodo getCategory ---------->");
-					DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(AssetCategory.class, "category", PortalClassLoaderUtil.getClassLoader());
-					Long categoryId = null;
-					Long vocabularyId = getVocabularyId(Contants.MARCAS);
-					try {
-						List<AssetCategory> assetCategories = AssetCategoryLocalServiceUtil.dynamicQuery(dynamicQuery);
-						for(AssetCategory category : assetCategories){
-							if(category.getVocabularyId() == vocabularyId){
-								if(category.getName().equalsIgnoreCase(marca)){
-									categoryId = category.getCategoryId();
-									log.info("Nombre de categoria: "+category.getName() +" id:" + categoryId);
-									if(category.getParentCategoryId() == categoryId){
-										log.info(category.getName());
-									}
-								}
-							}
-							
-						}
-						
-					} catch (Exception e) {
-						log.error("module getCategory: "+e);
-					}
-					return categoryId;
-				}
 				
 		//obteniendo subcategorias
-				public static void getSubCategory(){
+				public void getSubCategory(){
 					log.info("<---------- Metodo getCategory ---------->");
 					DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(AssetCategory.class, "category", PortalClassLoaderUtil.getClassLoader());
 					Long parentCategory = getCategory(marca);
@@ -432,7 +283,7 @@ public class Util {
 					}
 				}
 				
-				public long journalRootFolder(long parentFolder,String nameFolder,Long siteID){
+				public long journalRootFolder1(long parentFolder,String nameFolder,Long siteID){
 					DynamicQuery query_journal_folder = DynamicQueryFactoryUtil.forClass(com.liferay.journal.model.impl.JournalFolderImpl.class, "journalFolder",PortalClassLoaderUtil.getClassLoader());
 					query_journal_folder.add(RestrictionsFactoryUtil.eq("name", nameFolder));
 					query_journal_folder.add(RestrictionsFactoryUtil.eq("parentFolderId", new Long(parentFolder)));
@@ -441,7 +292,7 @@ public class Util {
 					return ja_1.get(0).getFolderId();
 					}
 				
-				public List<Long> journalByBrandFolder(long parentFolder,Long siteID){
+				public List<Long> journalByBrandFolder1(long parentFolder,Long siteID){
 					List<Long> listIdFolders = new ArrayList<>();
 					DynamicQuery query_journal_folder = DynamicQueryFactoryUtil.forClass(com.liferay.journal.model.impl.JournalFolderImpl.class, "journalFolder",PortalClassLoaderUtil.getClassLoader());
 					query_journal_folder.add( RestrictionsFactoryUtil.eq("parentFolderId", new Long(parentFolder)));
@@ -707,16 +558,8 @@ public class Util {
 						return new RoomMapping();
 						}
 			  	
-			  	public long getFolderBaseByConfiguration(Long siteID){
-					log.info("size: "+Contants.FOLDERS.size());
-					long id_posadas = 0; 
-					for (int i = 0; i < Contants.FOLDERS.size(); i++) {
-						id_posadas =journalRootFolder(id_posadas,Contants.FOLDERS.get(i),siteID); 
-						log.info("getFolder"+id_posadas); 
-					}
-					return id_posadas;
-				}
-			  	
+			  
+			  /*	
 			  	private static boolean getIntervals(String i, String f, String date){
 					
 					boolean estado = false;
@@ -734,7 +577,7 @@ public class Util {
 							e.getStackTrace();
 						}
 					return estado;
-				}
+				}*/
 			  
 }
 

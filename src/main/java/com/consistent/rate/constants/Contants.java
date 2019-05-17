@@ -20,7 +20,9 @@ public class Contants {
 	public static Long SITE_ID = null;
 	
 	
-	public static Long STRUCTUREID = null;
+	public static Long STRUCTURE_HOTEL_ID = null;
+	public static Long STRUCTURE_RATE_ID = null;
+	public static Long FOLDER_ID = null;
 	// NOMBRES DE CARPETAS
 	public static final String RATES = "rates";
 	public static final String HOTEL = "hotel";
