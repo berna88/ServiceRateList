@@ -35,6 +35,11 @@ public class Contants {
 	// LISTA DE FOLDERS
 	public static List<String> FOLDERS;
 	
+	// INDATE
+	public static String CHECKINDATE = "";
+	//OUTDATE
+	public static String CHECKOUTDATE = "";
+	
 	public static String NAME_STRUCTURE_DEFAULT;
 	//NOMBRE DE ESTRUCTURA
 	public static String HOTEL_ESTRUCUTURA = "hotel";

@@ -12,6 +12,7 @@ import com.consistent.rate.models.room.rooms;
 @XmlType(propOrder = {"guid","code","name","title","language", "keyword","shortDescription","description","order","channel","mediaLinks","locations","telephones","rooms"})
 public class Hotel {
 	
+	String hotel;
 	//String brandcode;
 	String guid;
 	String code;

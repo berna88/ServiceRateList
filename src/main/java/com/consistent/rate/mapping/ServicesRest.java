@@ -1,10 +1,13 @@
 package com.consistent.rate.mapping;
 
+import java.io.IOException;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.xml.stream.XMLStreamException;
 
 import com.consistent.rate.constants.Contants;
 import com.consistent.rate.models.Contents;
@@ -33,7 +36,7 @@ public class ServicesRest {
 			@QueryParam("bookingdate") String bookingdate,
 			@QueryParam("hotelcode") String hotelcode,
 			@QueryParam("checkindate") String checkindate,
-			@QueryParam("checkoutdate") String checkoutdate) throws PortalException {
+			@QueryParam("checkoutdate") String checkoutdate) throws PortalException, IOException, XMLStreamException {
 		log.info("<-------- Metodo getRateList Normal getHotelRoomRates--------->");
 		// Estableciendo el siteId del sitio
 		Contants.SITE_ID = Long.parseLong(siteID);
@@ -64,7 +67,7 @@ public class ServicesRest {
 			@QueryParam("hotelcode") String hotelcode,
 			@QueryParam("checkindate") String checkindate,
 			@QueryParam("checkoutdate") String checkoutdate,
-			@QueryParam("contractcodes") String contractcodes) throws PortalException {
+			@QueryParam("contractcodes") String contractcodes) throws PortalException, IOException, XMLStreamException {
 		log.info("<-------- Metodo getRateList Optimizado --------->");		
 		// Estableciendo el siteId del sitio
 		Contants.SITE_ID = Long.parseLong(siteID);
@@ -79,6 +82,9 @@ public class ServicesRest {
 		Contants.CODIGODEHOTEL = hotelcode;
 		//Estableciendo canal
 		Contants.CHANNEL = channel;
+		//Fechas
+		Contants.CHECKINDATE = checkindate;
+		Contants.CHECKOUTDATE = checkoutdate;
 		
 		Contents xml = _rates.getXML();
 		log.info("<-------- Proceso finalizado --------->");

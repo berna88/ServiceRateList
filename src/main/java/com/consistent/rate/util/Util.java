@@ -1,7 +1,12 @@
 package com.consistent.rate.util;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.Interval;
 
 import com.consistent.rate.constants.Contants;
 import com.consistent.rate.mapping.GetMappingHotel;
@@ -80,18 +85,19 @@ public class Util {
 		try {
 			
 			//DynamicQuery structureQuery = DDMStructureLocalServiceUtil.dynamicQuery().add(PropertyFactoryUtil.forName("name").like("%"+Contants.HOTEL_ESTRUCUTURA+"%"));
-		     DDMStructure results = DDMStructureLocalServiceUtil.getStructure(Contants.STRUCTUREID);
+		    DDMStructure results = DDMStructureLocalServiceUtil.getStructure(Contants.STRUCTUREID);
 			log.info("Estructura: "+results.getStructureKey());
-			
+			 
 			
 			
 			
 			DynamicQuery dynamicQueryFolder = DynamicQueryFactoryUtil.forClass(JournalFolderImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
-			dynamicQueryFolder.add(PropertyFactoryUtil.forName("name").eq("Hotel"));
+			dynamicQueryFolder.add(PropertyFactoryUtil.forName("name").eq(Contants.FOLDERS.get(1)));
 			dynamicQueryFolder.add(PropertyFactoryUtil.forName("groupId").eq(Contants.SITE_ID));
 			List<JournalFolder> folders = JournalFolderLocalServiceUtil.dynamicQuery(dynamicQueryFolder);
 			
 			parentFolderId = folders.get(0).getFolderId();
+			log.info("Tamaño para obtener el folder de Hotel: "+folders.size());
 			log.info("Parent folder: "+parentFolderId);
 			
 			
@@ -102,7 +108,7 @@ public class Util {
 			dynamicQueryFolderId.add(PropertyFactoryUtil.forName("parentFolderId").eq(parentFolderId));
 			List<JournalFolder> foldersId = JournalFolderLocalServiceUtil.dynamicQuery(dynamicQueryFolderId);
 			folderId = foldersId.get(0).getFolderId();*/
-			JournalFolder folder = JournalFolderLocalServiceUtil.fetchFolder(Contants.SITE_ID, parentFolderId, Contants.CODIGODEMARCA.toLowerCase().toString()); //.getFolders(Contants.SITE_ID,parentFolderId);
+			JournalFolder folder = JournalFolderLocalServiceUtil.fetchFolder(Contants.SITE_ID, parentFolderId, Contants.CODIGODEMARCA); //.getFolders(Contants.SITE_ID,parentFolderId);
 			folderId = folder.getFolderId();
 			log.info("Folder id: "+folderId);
 			
@@ -132,8 +138,9 @@ public class Util {
 			}
 			log.info("Total de hoteles: "+hotels.size());
 		}  catch (IndexOutOfBoundsException ie) {
-			log.error("El nombre de la Marca o el nombre de la carpeta hotel no son validos");
+			log.error("El nombre de la carpeta Hotel No coincide");
 			log.error("Causa: " + ie.getCause());
+			ie.fillInStackTrace();
 		} catch (NoSuchStructureException e) {
 			// TODO: handle exception
 			log.error("La estructura no existe");
@@ -180,7 +187,7 @@ public class Util {
 			assetEntryQuery.setAnyCategoryIds(new long[] { categoryId });
 			assetEntryQuery.setClassName("com.liferay.journal.model.JournalArticle");
 			List<AssetEntry> assetEntryList = AssetEntryLocalServiceUtil.getEntries(assetEntryQuery);
-			log.info("Size:"+assetEntryList.size());
+			log.info("Tamaño:"+assetEntryList.size());
 			Long structureId = getStructure();
 			
 			
@@ -256,10 +263,11 @@ public class Util {
 			Long categoryId = getCategory(Contants.CODIGODEMARCA);
 			assetEntryQuery.setAnyCategoryIds(new long[] { categoryId });
 			assetEntryQuery.setClassName("com.liferay.journal.model.JournalArticle");
+	
 			List<AssetEntry> assetEntryList = AssetEntryLocalServiceUtil.getEntries(assetEntryQuery);
 			log.info("Size:"+assetEntryList.size());
 			Long structureId = getStructure();
-			
+			int count = 0;
 			try {
 				for (AssetEntry ae : assetEntryList) {
 					//System.out.println(ae.getClassName() + " = "+ae.getClassNameId());
@@ -267,46 +275,54 @@ public class Util {
 				    JournalArticle journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleResource.getResourcePrimKey());
 				    if(journalArticle.getGroupId() == Contants.SITE_ID){
 				    	if(journalArticle.getDDMStructure().getStructureId() == structureId){
-				    			
+				    				
 									//article.add(journalArticle);
 									final Rate rate = new Rate();
 									rate.setTitle(journalArticle.getTitle(locale));
 									Document document = null;
+									
+									
+									
 									document = SAXReaderUtil.read(journalArticle.getContentByLocale(locale));
 									
-									rate.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
-									rate.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
-									rate.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
-									rate.setDescription(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
-									rate.setShortDescription(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
-									rate.setBenefits(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
-									rate.setRestrictions(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
-									rate.setCurrency(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
-									rate.setEnddate(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
-									rate.setGuid(journalArticle.getArticleId());
-									rate.setLanguage(Contants.LENGUAJE);
-									rate.setChannel("www");
-									rate.setOrder("0");
 									
-									List<Multimedia> multimedia = new ArrayList<>();
-									Multimedia multi = new Multimedia();
-									multi.setUrl(document.valueOf("//dynamic-element[@name='mediaLinkRate']/dynamic-content/text()"));
-									multi.setType("icon");
-									multimedia.add(multi);
+									if(getIntervals(Contants.CHECKINDATE, Contants.CHECKOUTDATE, document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"))){
+										count++;
+										rate.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
+										rate.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
+										rate.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
+										rate.setDescription(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
+										rate.setShortDescription(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
+										rate.setBenefits(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
+										rate.setRestrictions(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
+										rate.setCurrency(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
+										rate.setEnddate(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
+										rate.setGuid(journalArticle.getArticleId());
+										rate.setLanguage(Contants.LENGUAJE);
+										rate.setChannel("www");
+										rate.setOrder("0");
+										
+										List<Multimedia> multimedia = new ArrayList<>();
+										Multimedia multi = new Multimedia();
+										multi.setUrl(document.valueOf("//dynamic-element[@name='mediaLinkRate']/dynamic-content/text()"));
+										multi.setType("icon");
+										multimedia.add(multi);
+										
+										List<MediaLink> medialink = new ArrayList<>();
+										MediaLink link = new MediaLink();
+										link.setKeyword("rate_icon");
+										link.setType("image");
+										link.setMultimedia(multimedia);
+										medialink.add(link);
+										
+										List<MediaLinks> mediaLinks = new ArrayList<>();
+										MediaLinks links = new MediaLinks();
+										links.setMedialinks(medialink);
+										mediaLinks.add(links);
+										rate.setMediaLinks(mediaLinks);
+										rates.add(rate);
+									}
 									
-									List<MediaLink> medialink = new ArrayList<>();
-									MediaLink link = new MediaLink();
-									link.setKeyword("rate_icon");
-									link.setType("image");
-									link.setMultimedia(multimedia);
-									medialink.add(link);
-									
-									List<MediaLinks> mediaLinks = new ArrayList<>();
-									MediaLinks links = new MediaLinks();
-									links.setMedialinks(medialink);
-									mediaLinks.add(links);
-									rate.setMediaLinks(mediaLinks);
-									rates.add(rate);
 								   
 								 
 							
@@ -314,6 +330,7 @@ public class Util {
 					    }
 				    }
 				}
+				log.info(count);
 			} catch (Exception e) {
 				log.error("module getWebContentRate: "+e);
 			}
@@ -698,6 +715,25 @@ public class Util {
 						log.info("getFolder"+id_posadas); 
 					}
 					return id_posadas;
+				}
+			  	
+			  	private static boolean getIntervals(String i, String f, String date){
+					
+					boolean estado = false;
+					try {
+						String d = date.replace('/','-');
+						String init = i.replace('/','-');
+						String end = f.replace('/','-');
+						String fi = (end.equals(""))? DateTime.now().toString():end;
+						DateTime inicio = new DateTime(init);
+						DateTime fin = new DateTime(fi);
+						Interval interval = new Interval(inicio, fin);
+						estado = interval.contains(new DateTime(d));
+						} catch (IllegalArgumentException e) {
+						// TODO: handle exception
+							e.getStackTrace();
+						}
+					return estado;
 				}
 			  
 }

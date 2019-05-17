@@ -213,9 +213,11 @@ public class GetMappingRate {
 		if (_sampleRESTConfiguration != null) {
 			if(_sampleRESTConfiguration.idStructure()!=0){
 				Contants.STRUCTUREID =_sampleRESTConfiguration.idStructure();
+				log.info("For sample DXP REST config, info="+Contants.STRUCTUREID);
 			}
 			else{
-				Contants.STRUCTUREID = new Long(94858);
+				Contants.STRUCTUREID = new Long(1516944);
+				log.info("For sample DXP REST config, info="+Contants.STRUCTUREID);
 			}
 			
 			
@@ -228,6 +230,7 @@ public class GetMappingRate {
 				Contants.FOLDERS.add("Posadas");
 				Contants.FOLDERS.add("Hotel");
 				log.info("For sample DXP REST config, info="+Contants.FOLDERS);
+				
 			}
 			if(_sampleRESTConfiguration.NameDefaultStructure()!= null && !_sampleRESTConfiguration.NameDefaultStructure().isEmpty()){
 				Contants.NAME_STRUCTURE_DEFAULT = _sampleRESTConfiguration.NameDefaultStructure();
