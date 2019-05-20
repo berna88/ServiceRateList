@@ -1,33 +1,17 @@
 package com.consistent.rate.util;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
-
 import com.consistent.rate.constants.Contants;
 import com.consistent.rate.mapping.GetMappingHotel;
 import com.consistent.rate.mapping.RoomMapping;
-import com.consistent.rate.models.Rate;
 import com.consistent.rate.models.hotel.Hotel;
 import com.consistent.rate.models.hotel.MediaLink;
-import com.consistent.rate.models.hotel.MediaLinks;
-import com.consistent.rate.models.hotel.Multimedia;
-import com.consistent.rate.sax.Mapping;
-import com.consistent.rate.sax.RateMapping;
 import com.consistent.rate.singleton.Portal;
 import com.liferay.asset.kernel.model.AssetCategory;
-import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
-import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
-import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
 import com.liferay.dynamic.data.mapping.exception.NoSuchStructureException;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.model.JournalArticleResource;
 import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.model.impl.JournalArticleImpl;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
@@ -47,20 +31,23 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 public class Util extends Portal{
+	
 	private static final Log log = LogFactoryUtil.getLog(Util.class);
 	static String marca = "";
 	
 	
 	//Metodo que obtienes todos los hoteles
-	public static List<Hotel> getHotels() throws PortalException{
+	public static HashSet<Hotel> getHotels() throws PortalException{
 		GetMappingHotel content = new GetMappingHotel();
 		Hotel mapping = new Hotel();
 		
-		List<Hotel> hotels = new ArrayList<>();
+		final HashSet<Hotel> hotels = new HashSet<>();
 		
 		try {
 			//Obtiene el Id de la estructura
@@ -74,7 +61,7 @@ public class Util extends Portal{
 			dynamicQueryJournal.add(PropertyFactoryUtil.forName("DDMStructureKey").eq(results.getStructureKey()));
 			dynamicQueryJournal.add(PropertyFactoryUtil.forName("groupId").eq(new Long(Contants.SITE_ID)));
 			dynamicQueryJournal.add(PropertyFactoryUtil.forName("treePath").like("%"+folderId+"%"));
-			List<JournalArticle> journalArticles = JournalArticleLocalServiceUtil.dynamicQuery(dynamicQueryJournal);
+			final HashSet<JournalArticle> journalArticles = new HashSet<JournalArticle>(JournalArticleLocalServiceUtil.dynamicQuery(dynamicQueryJournal));
 			for (JournalArticle journal : journalArticles) {
 				if(!journal.isInTrash()){
 					if(JournalArticleLocalServiceUtil.isLatestVersion(Contants.SITE_ID, journal.getArticleId(), journal.getVersion(),WorkflowConstants.STATUS_APPROVED)){
@@ -108,88 +95,6 @@ public class Util extends Portal{
 		return hotels;
 	}
 	
-		
-	/*	
-		public HashSet<RateMapping> getWebContentRate(String locale) throws PortalException{
-			log.info("<---------- Metodo getWebContentRate Sin contrato---------->");
-			AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
-			final HashSet<RateMapping> rates = new HashSet<RateMapping>();
-			Long categoryId = getCategory(Contants.CODIGODEMARCA);
-			assetEntryQuery.setAnyCategoryIds(new long[] { categoryId });
-			assetEntryQuery.setClassName("com.liferay.journal.model.JournalArticle");
-			final HashSet<AssetEntry> assetEntryList = new HashSet<AssetEntry>(AssetEntryLocalServiceUtil.getEntries(assetEntryQuery)) ;
-			log.info("Tamaño de elemento por categorias: "+assetEntryList.size());
-			int count = 0;
-			RateMapping mapping;
-			try {
-				final Long startHashSetTime = System.currentTimeMillis();
-				for (AssetEntry ae : assetEntryList) {
-				    JournalArticleResource journalArticleResource = JournalArticleResourceLocalServiceUtil.getJournalArticleResource(ae.getClassPK());
-				    JournalArticle journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleResource.getResourcePrimKey());
-				    if(journalArticle.getGroupId() == Contants.SITE_ID){
-				    	if(journalArticle.getDDMStructure().getStructureId() == Contants.STRUCTURE_RATE_ID){
-				    				
-									//article.add(journalArticle);
-									final Rate rate = new Rate();
-									rate.setTitle(journalArticle.getTitle(locale));
-									Document document = null;
-									
-									document = SAXReaderUtil.read(journalArticle.getContentByLocale(locale));
-									
-										count++;
-										mapping = new RateMapping("", document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"), "", Contants.LENGUAJE, document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"), Mapping.order, Mapping.channel, document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()")); 
-										rate.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
-										rate.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
-										rate.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
-										rate.setDescription(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
-										rate.setShortDescription(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
-										rate.setBenefits(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
-										rate.setRestrictions(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
-										rate.setCurrency(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
-										rate.setEnddate(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
-										rate.setGuid(journalArticle.getArticleId());
-										rate.setLanguage(Contants.LENGUAJE);
-										rate.setChannel("www");
-										rate.setOrder("0");
-										
-										List<Multimedia> multimedia = new ArrayList<>();
-										Multimedia multi = new Multimedia();
-										multi.setUrl(document.valueOf("//dynamic-element[@name='mediaLinkRate']/dynamic-content/text()"));
-										multi.setType("icon");
-										multimedia.add(multi);
-										
-										List<MediaLink> medialink = new ArrayList<>();
-										MediaLink link = new MediaLink();
-										link.setKeyword("rate_icon");
-										link.setType("image");
-										link.setMultimedia(multimedia);
-										medialink.add(link);
-										
-										List<MediaLinks> mediaLinks = new ArrayList<>();
-										MediaLinks links = new MediaLinks();
-										links.setMedialinks(medialink);
-										mediaLinks.add(links);
-										rate.setMediaLinks(mediaLinks);
-										rates.add(rate);
-										rates.add(mapping);
-							
-					   // article.add(journalArticle);
-					    }
-				    }
-				}
-				final Long endHashSetTime = System.currentTimeMillis();
-				log.info("Tiempo de conversion en segundos: " + (endHashSetTime - startHashSetTime)/1000);
-				log.info("Filtrados por fecha: " + count);
-			} catch (Exception e) {
-				log.error("module getWebContentRate: "+e);
-			}
-			return rates;
-			
-		}
-		
-		*/
-		
-				
 		//obteniendo subcategorias
 				public void getSubCategory(){
 					log.info("<---------- Metodo getCategory ---------->");
@@ -227,7 +132,6 @@ public class Util extends Portal{
 							}
 					return listIdFolders;
 					}
-				
 				
 			  	@SuppressWarnings("deprecation")
 				public com.consistent.rate.models.hotel.Hotel getJournalArticleByFolderId(long folderId,String brand,String language,Long siteID) throws PortalException{
@@ -282,7 +186,8 @@ public class Util extends Portal{
 			  			return journalList;
 
 			  		}
-			  	 public List<DDMStructure> getStruct(String nameStructure,Long siteID) {
+			  	
+			  	public List<DDMStructure> getStruct(String nameStructure,Long siteID) {
 				        DynamicQuery query = DDMStructureLocalServiceUtil.dynamicQuery()
 				                .add(PropertyFactoryUtil.forName("name").like(nameStructure))
 				                 .add(PropertyFactoryUtil.forName("groupId").eq(new Long(siteID)));
@@ -293,6 +198,7 @@ public class Util extends Portal{
 				        }
 				        return structures;
 				    }
+			  	
 			  	public Long journalByCodeFolder(long parentFolder,String nameFolder,Long siteID){
 					DynamicQuery query_journal_folder = DynamicQueryFactoryUtil.forClass(com.liferay.journal.model.impl.JournalFolderImpl.class, "journalFolder",PortalClassLoaderUtil.getClassLoader());
 					query_journal_folder.add(PropertyFactoryUtil.forName("groupId").eq(new Long(siteID)));
@@ -467,8 +373,7 @@ public class Util extends Portal{
 					hote.setRooms(room_root);	
 					return  hote;
 			}
-			  	
-			  	
+			  		
 			  	public static RoomMapping getJournalArticleByClassPkRoom(Long classPk,String laguage,Long siteID) throws PortalException{
 					 com.consistent.rate.mapping.RoomMapping roomMapping = new com.consistent.rate.mapping.RoomMapping();
 					 DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(com.liferay.journal.model.impl.JournalArticleImpl.class, "journal",PortalClassLoaderUtil.getClassLoader());			

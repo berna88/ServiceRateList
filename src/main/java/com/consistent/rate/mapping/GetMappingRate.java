@@ -39,7 +39,8 @@ import org.osgi.service.component.annotations.Modified;
 		configurationPid = "com.consistent.rate.configuration.Otherconfig",
 		configurationPolicy = ConfigurationPolicy.OPTIONAL,
 		property={"jaxrs.application=true"})
-public class GetMappingRate {
+
+public class GetMappingRate extends RateMapping{
 	private static final Log log = LogFactoryUtil.getLog(GetMappingRate.class);
 	RateMapping _util_rate=  new RateMapping();
 	
@@ -47,7 +48,7 @@ public class GetMappingRate {
 		// Metodo que filtra por codigo
 		public HashSet<RateMapping> getArticlesByCodeBrand() throws PortalException{
 			
-			HashSet<JournalArticle> articlesFilterCategories = _util_rate.getWebContentRate();// Obtiene los datos ya filtrados por query
+			HashSet<JournalArticle> articlesFilterCategories = getWebContentRate();// Obtiene los datos ya filtrados por query
 			
 			HashSet<JournalArticle> articlesFilterContract = new HashSet<JournalArticle>();
 			
@@ -75,7 +76,7 @@ public class GetMappingRate {
 				}
 				rates = RatesContents(articlesFilterCategories, locale);
 			}else{
-				rates = _util_rate.getWebContentRate(locale);
+				rates = getWebContentRate(locale);
 				log.info("Sin contratos");
 			}
 			return rates;
@@ -94,8 +95,8 @@ public class GetMappingRate {
 		Mapping mapping = new MarcaMapping("", "", "", "", "", rates);
 		List<Rates> rates2 = new ArrayList<>();
 		//rates2.add(new Rates(rates));
-		
-		brand.setHotel(Util.getHotels());
+		Util.getHotels();
+		//brand.setHotel();
 		
 		brand.setRates(rates2);
 		brand.setCode(Contants.CODIGODEMARCA);

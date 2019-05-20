@@ -501,4 +501,6 @@ public class RateMapping extends Portal implements Mapping{
 				return article;
 				
 			}
+
+	
 }
