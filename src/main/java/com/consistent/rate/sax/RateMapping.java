@@ -319,31 +319,27 @@ public class RateMapping extends Portal implements Mapping{
 	}
 	
 	//Metodo que contiene todos los elementos en Rate
-	public HashSet<RateMapping> getWebContentRate(String locale) throws PortalException{
+	private HashSet<RateMapping> getWebContentRate(String locale) throws PortalException{
 		log.info("<---------- Metodo getWebContentRate Sin contrato---------->");
-		AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
+		final AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
 		//Coleccion donde se van a guardar lista de rates
 		final HashSet<RateMapping> rates = new HashSet<RateMapping>();
 		Long categoryId = getCategory(Constants.CODIGODEMARCA);
 		assetEntryQuery.setClassTypeIds(new long[]{Constants.STRUCTURE_RATE_ID} );
 		assetEntryQuery.setGroupIds(new long[]{Constants.SITE_ID} );
-		log.info(categoryId);
 		assetEntryQuery.setAnyCategoryIds(new long[] { categoryId });
 		assetEntryQuery.setClassName("com.liferay.journal.model.JournalArticle");
 		final HashSet<AssetEntry> assetEntryList = new HashSet<AssetEntry>(AssetEntryLocalServiceUtil.getEntries(assetEntryQuery));//convirtiendo la lista en hashSet
 		log.info("Tamaño de elemento por categorias: "+assetEntryList.size());
 		RateMapping mapping;
-		int con = 0;
 		try {
-			final Long startHashSetTime = System.currentTimeMillis();
 			for (AssetEntry ae : assetEntryList) {
 				// JournalArticleResource journalArticleResource = JournalArticleResourceLocalServiceUtil.getJournalArticleResource(ae.getClassPK());
 			    // JournalArticle journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleResource.getResourcePrimKey());
-			    JournalArticle journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(ae.getClassPK());
-				 		con++;	
+			    final JournalArticle journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(ae.getClassPK());
 								//article.add(journalArticle);
-								final Rate rate = new Rate();
-								rate.setTitle(journalArticle.getTitle(locale));
+								//final Rate rate = new Rate();
+								//rate.setTitle(journalArticle.getTitle(locale));
 								Document document = null;
 								
 								document = SAXReaderUtil.read(journalArticle.getContentByLocale(locale));
@@ -388,18 +384,15 @@ public class RateMapping extends Portal implements Mapping{
 				   // article.add(journalArticle);
 				    
 			}
-			final Long endHashSetTime = System.currentTimeMillis();
-			log.info("Tiempo de conversion de todos los rate en segundos: " + (endHashSetTime - startHashSetTime)/1000);
 		} catch (Exception e) {
 			log.error("module getWebContentRate: "+e);
 		}
-		log.info("con" + con);
 		return rates;
 		
 	}
 	
 	// Metodo que obtiene los rate por filtro
-	public HashSet<RateMapping> getWebContentRateFilter(String[] codesSplit,String locale) throws PortalException{
+	private HashSet<RateMapping> getWebContentRateFilter(String[] codesSplit,String locale) throws PortalException{
 		log.info("<---------- Metodo getWebContentRate Con filtros ---------->");
 		AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
 		final HashSet<RateMapping> rates = new HashSet<>();
@@ -475,7 +468,26 @@ public class RateMapping extends Portal implements Mapping{
 		
 	}
 	
-	
+	// Metodo que filtra por codigo
+	public HashSet<RateMapping> getArticlesByCodeBrand() throws PortalException{
+				
+				HashSet<RateMapping> rates = new HashSet<>();
+				
+				String locale = Constants.getLanguaje();// Contiene el lenguaje
+				
+				log.info("Contratos: "+ Constants.CONTRACTCODES);
+				// condicion para filtrar contratos
+				if(!Constants.CONTRACTCODES.equals("")){
+					String codes = Constants.CONTRACTCODES;// vienen los contratos filtrados
+					Constants.CONTRACTCODES = "";// se restablece el valor
+					String[] codesSplit = codes.split(",");
+					rates = getWebContentRateFilter(codesSplit,locale);
+				}else{
+					rates = getWebContentRate(locale);
+					log.info("Sin contratos");
+				}
+				return rates;
+			}
 
 	
 }

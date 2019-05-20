@@ -1,25 +1,8 @@
 package com.consistent.rate.mapping;
 
-import com.consistent.rate.configuration.Otherconfig;
-import com.consistent.rate.constants.Constants;
-import com.consistent.rate.models.Brand;
-import com.consistent.rate.models.Content;
-import com.consistent.rate.models.Contents;
-import com.consistent.rate.models.Rates;
-import com.consistent.rate.sax.Mapping;
-import com.consistent.rate.sax.MarcaMapping;
-import com.consistent.rate.sax.RateMapping;
-import com.consistent.rate.util.Util;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
@@ -28,6 +11,17 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
+
+import com.consistent.rate.configuration.Otherconfig;
+import com.consistent.rate.constants.Constants;
+import com.consistent.rate.sax.Mapping;
+import com.consistent.rate.sax.MarcaMapping;
+import com.consistent.rate.sax.RateMapping;
+import com.consistent.rate.util.Util;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 
 @Component(
@@ -40,54 +34,33 @@ public class GetMappingRate extends RateMapping{
 	
 	private static final Log log = LogFactoryUtil.getLog(GetMappingRate.class);
 	
-		// Metodo que filtra por codigo
-		public HashSet<RateMapping> getArticlesByCodeBrand() throws PortalException{
-			
-			HashSet<RateMapping> rates = new HashSet<>();
-			
-			String locale = Constants.getLanguaje();// Contiene el lenguaje
-			
-			log.info("Contratos: "+ Constants.CONTRACTCODES);
-			// condicion para filtrar contratos
-			if(!Constants.CONTRACTCODES.equals("")){
-				String codes = Constants.CONTRACTCODES;// vienen los contratos filtrados
-				Constants.CONTRACTCODES = "";// se restablece el valor
-				String[] codesSplit = codes.split(",");
-				rates = getWebContentRateFilter(codesSplit,locale);
-			}else{
-				rates = getWebContentRate(locale);
-				log.info("Sin contratos");
-			}
-			return rates;
-		}
-	
-	
+
 	public final String getXML() throws PortalException, XMLStreamException, IOException{
-		String nameBrand = Constants.getNameBrand(Constants.CODIGODEMARCA);
+		//String nameBrand = Constants.getNameBrand(Constants.CODIGODEMARCA);
 		
 		
 		//Se crea el brand que contendra toda la información
-		Brand brand = new Brand();
+		//Brand brand = new Brand();
 		
 		// Se iteran los rates para la inserción en marca
 		HashSet<RateMapping> rates = getArticlesByCodeBrand();
-		Mapping mapping = new MarcaMapping("", "", "", "", "", rates);
-		List<Rates> rates2 = new ArrayList<>();
+		Mapping mapping = new MarcaMapping("", Constants.CODIGODEMARCA, Constants.getNameBrand(Constants.CODIGODEMARCA), "", Constants.LENGUAJE, rates);
+		//List<Rates> rates2 = new ArrayList<>();
 		//rates2.add(new Rates(rates));
 		Util.getHotels();
 		//brand.setHotel();
-		
+		/*
 		brand.setRates(rates2);
 		brand.setCode(Constants.CODIGODEMARCA);
 		brand.setLanguage(Constants.LENGUAJE);
 		brand.setChannel(Constants.CHANNEL);
 		brand.setOrder("0");
-		brand.setName(nameBrand);
+		brand.setName(nameBrand);*/
 		
-		List <Content> content = new  ArrayList<Content>();
+		/*List <Content> content = new  ArrayList<Content>();
 		content.add(new Content(brand));
 		final Contents contents = new Contents();
-		contents.setContent(content);
+		contents.setContent(content);*/
 		return mapping.getMapping();
 	
 	}
