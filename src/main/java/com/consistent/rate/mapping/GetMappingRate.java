@@ -1,5 +1,24 @@
 package com.consistent.rate.mapping;
 
+import com.consistent.rate.configuration.Otherconfig;
+import com.consistent.rate.constants.Contants;
+import com.consistent.rate.models.Brand;
+import com.consistent.rate.models.Content;
+import com.consistent.rate.models.Contents;
+import com.consistent.rate.models.Rate;
+import com.consistent.rate.models.Rates;
+import com.consistent.rate.sax.Mapping;
+import com.consistent.rate.sax.MarcaMapping;
+import com.consistent.rate.sax.RateMapping;
+import com.consistent.rate.util.Util;
+import com.liferay.journal.model.JournalArticle;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,29 +32,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
-
-import com.consistent.rate.configuration.Otherconfig;
-import com.consistent.rate.constants.Contants;
-import com.consistent.rate.models.Brand;
-import com.consistent.rate.models.Content;
-import com.consistent.rate.models.Contents;
-import com.consistent.rate.models.Rate;
-import com.consistent.rate.models.Rates;
-import com.consistent.rate.models.hotel.Hotel;
-import com.consistent.rate.models.hotel.MediaLink;
-import com.consistent.rate.models.hotel.MediaLinks;
-import com.consistent.rate.models.hotel.Multimedia;
-import com.consistent.rate.sax.Mapping;
-import com.consistent.rate.sax.MarcaMapping;
-import com.consistent.rate.sax.RateMapping;
-import com.consistent.rate.util.Util;
-import com.liferay.journal.model.JournalArticle;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
 
 @Component(
@@ -51,9 +47,9 @@ public class GetMappingRate {
 		// Metodo que filtra por codigo
 		public HashSet<RateMapping> getArticlesByCodeBrand() throws PortalException{
 			
-			//List<JournalArticle> articlesFilterCategories = Util.getWebContentRate();// Obtiene los datos ya filtrados por query
+			HashSet<JournalArticle> articlesFilterCategories = _util_rate.getWebContentRate();// Obtiene los datos ya filtrados por query
 			
-			//List<JournalArticle> articlesFilterContract = new ArrayList<JournalArticle>();
+			HashSet<JournalArticle> articlesFilterContract = new HashSet<JournalArticle>();
 			
 			
 			HashSet<RateMapping> rates = new HashSet<>();
@@ -66,10 +62,10 @@ public class GetMappingRate {
 				
 				String codes = Contants.CONTRACTCODES;// vienen los contratos filtrados
 				Contants.CONTRACTCODES = "";// se restablece el valor
-				System.out.println("Con contratos");
+				log.info("Con contratos");
 				String[] codesSplit = codes.split(",");
-				//rates = Util.getWebContentRate(codesSplit,locale);
-				/*for(JournalArticle a:articlesFilterCategories){
+				rates = _util_rate.getWebContentRateFilter(codesSplit,locale);
+				for(JournalArticle a:articlesFilterCategories){
 					
 					for(int i = 0; i < codesSplit.length;i++)
 					{
@@ -77,8 +73,7 @@ public class GetMappingRate {
 						   {articlesFilterContract.add(a); break;}
 					}
 				}
-				*/
-				//rates = RatesContents(articlesFilterCategories, locale);
+				rates = RatesContents(articlesFilterCategories, locale);
 			}else{
 				rates = _util_rate.getWebContentRate(locale);
 				log.info("Sin contratos");
@@ -129,13 +124,13 @@ public class GetMappingRate {
 	}*/
 	
 
-	public final List<Rate> RatesContents(List<JournalArticle> articles, String locale) throws PortalException {
+	public final HashSet<RateMapping> RatesContents(HashSet<JournalArticle> articles, String locale) throws PortalException {
 		log.info("<------ Metodo RatesContents ------>");
-		List<Rate> rates = new ArrayList<Rate>();
+		HashSet<RateMapping> rates = new HashSet<>();
 		
 		long TInicio, TFin, tiempo;
 		TInicio = System.currentTimeMillis(); 
-		
+		RateMapping mapping;
 		for(JournalArticle article: articles){
 			final Rate rate = new Rate();
 			//rate.setArticleId(article.getArticleId());
@@ -154,8 +149,9 @@ public class GetMappingRate {
 				log.info(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
 				log.info(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
 				log.info(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));*/
-			
-				rate.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
+				mapping = new RateMapping("", document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"), "", Contants.LENGUAJE, document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"), Mapping.order, Mapping.channel, document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()")); 
+				
+				/*rate.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
 				rate.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
 				rate.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
 				rate.setDescription(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
@@ -187,8 +183,8 @@ public class GetMappingRate {
 				links.setMedialinks(medialink);
 				mediaLinks.add(links);
 				
-				rate.setMediaLinks(mediaLinks);
-				rates.add(rate);
+				rate.setMediaLinks(mediaLinks);*/
+				rates.add(mapping);
 				
 				
 				

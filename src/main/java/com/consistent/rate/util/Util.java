@@ -55,7 +55,7 @@ public class Util extends Portal{
 	static String marca = "";
 	
 	
-	//Obtener Hoteles
+	//Metodo que obtienes todos los hoteles
 	public static List<Hotel> getHotels() throws PortalException{
 		GetMappingHotel content = new GetMappingHotel();
 		Hotel mapping = new Hotel();
@@ -63,9 +63,10 @@ public class Util extends Portal{
 		List<Hotel> hotels = new ArrayList<>();
 		
 		try {
-			
+			//Obtiene el Id de la estructura
 		    DDMStructure results = DDMStructureLocalServiceUtil.getStructure(Contants.STRUCTURE_HOTEL_ID);
 			log.info("Estructura: "+results.getStructureKey());
+			//Obtiene el Id de la carpeta 
 			JournalFolder folder = JournalFolderLocalServiceUtil.fetchFolder(Contants.SITE_ID, Contants.FOLDER_ID, Contants.CODIGODEMARCA);
 			long folderId = folder.getFolderId();
 			log.info("Folder id: "+folderId);
@@ -80,7 +81,6 @@ public class Util extends Portal{
 						 content.HotelContentsMapping(journal, Contants.getLanguaje());
 						 mapping = getHotelRooms(content,Contants.CODIGODEMARCA.toLowerCase().toString(),Contants.getLanguaje(),Contants.SITE_ID);
 						 if(Contants.CODIGODEHOTEL!=null){
-							 
 							 if(mapping.getCode().equalsIgnoreCase(Contants.CODIGODEHOTEL)){
 								 log.info("Codigo de hotel: "+mapping.getCode());
 								 hotels.add(mapping);
@@ -105,85 +105,9 @@ public class Util extends Portal{
 			log.error("El nombre de la Marca");
 			log.error("Causa: " + e.getCause());
 		}
-		
 		return hotels;
 	}
 	
-		
-		// Obteniendo los web content de rate por categorias
-		public List<Rate> getWebContentRate(String[] codesSplit,String locale) throws PortalException{
-			log.info("<---------- Metodo getWebContentRate ---------->");
-			log.info("<------Nombre de la estructura: ----->");
-			AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
-			List<Rate> rates = new ArrayList<Rate>();
-			Long categoryId = getCategory(Contants.CODIGODEMARCA);
-			assetEntryQuery.setAnyCategoryIds(new long[] { categoryId });
-			assetEntryQuery.setClassName("com.liferay.journal.model.JournalArticle");
-			List<AssetEntry> assetEntryList = AssetEntryLocalServiceUtil.getEntries(assetEntryQuery);
-			log.info("Tamaño:"+assetEntryList.size());
-			try {
-				for (AssetEntry ae : assetEntryList) {
-					//System.out.println(ae.getClassName() + " = "+ae.getClassNameId());
-				    JournalArticleResource journalArticleResource = JournalArticleResourceLocalServiceUtil.getJournalArticleResource(ae.getClassPK());
-				    JournalArticle journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleResource.getResourcePrimKey());
-				    if(journalArticle.getGroupId() == Contants.SITE_ID){
-				    	if(journalArticle.getDDMStructure().getStructureId() == Contants.STRUCTURE_RATE_ID){
-				    		for(int i = 0; i < codesSplit.length;i++)
-							{
-								if(journalArticle.getContent().contains(codesSplit[i]))
-								   {
-									//article.add(journalArticle);
-									final Rate rate = new Rate();
-									rate.setTitle(journalArticle.getTitle(locale));
-									Document document = null;
-									document = SAXReaderUtil.read(journalArticle.getContentByLocale(locale));
-									
-									rate.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
-									rate.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
-									rate.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
-									rate.setDescription(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
-									rate.setShortDescription(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
-									rate.setBenefits(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
-									rate.setRestrictions(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
-									rate.setCurrency(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
-									rate.setEnddate(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
-									rate.setGuid(journalArticle.getArticleId());
-									rate.setLanguage(Contants.LENGUAJE);
-									rate.setChannel("www");
-									rate.setOrder("0");
-									
-									List<Multimedia> multimedia = new ArrayList<>();
-									Multimedia multi = new Multimedia();
-									multi.setUrl(document.valueOf("//dynamic-element[@name='mediaLinkRate']/dynamic-content/text()"));
-									multi.setType("icon");
-									multimedia.add(multi);
-									
-									List<MediaLink> medialink = new ArrayList<>();
-									MediaLink link = new MediaLink();
-									link.setKeyword("rate_icon");
-									link.setType("image");
-									link.setMultimedia(multimedia);
-									medialink.add(link);
-									
-									List<MediaLinks> mediaLinks = new ArrayList<>();
-									MediaLinks links = new MediaLinks();
-									links.setMedialinks(medialink);
-									mediaLinks.add(links);
-									rate.setMediaLinks(mediaLinks);
-									rates.add(rate);
-								   
-								   break;}
-							}
-					   // article.add(journalArticle);
-					    }
-				    }
-				}
-			} catch (Exception e) {
-				log.error("module getWebContentRate: "+e);
-			}
-			return rates;
-			
-		}
 		
 	/*	
 		public HashSet<RateMapping> getWebContentRate(String locale) throws PortalException{
