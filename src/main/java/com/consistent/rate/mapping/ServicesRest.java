@@ -1,7 +1,6 @@
 package com.consistent.rate.mapping;
 
 import java.io.IOException;
-import java.util.HashSet;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -10,8 +9,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.xml.stream.XMLStreamException;
 
-import com.consistent.rate.constants.Contants;
-import com.consistent.rate.models.Contents;
+import com.consistent.rate.constants.Constants;
 import com.consistent.rate.util.Util;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -19,7 +17,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 @Path("/services/posadas")
 public class ServicesRest {
-	private static final Log log = LogFactoryUtil.getLog(GetMappingRate.class);
+	
+	private static final Log log = LogFactoryUtil.getLog(ServicesRest.class);
 
 	GetMappingRate _rates= new GetMappingRate();
     
@@ -40,16 +39,16 @@ public class ServicesRest {
 			@QueryParam("checkoutdate") String checkoutdate) throws PortalException, IOException, XMLStreamException {
 		log.info("<-------- Metodo getRateList Normal getHotelRoomRates--------->");
 		// Estableciendo el siteId del sitio
-		Contants.SITE_ID = Long.parseLong(siteID);
+		Constants.SITE_ID = Long.parseLong(siteID);
 		// Estableciendo la marca
-		Contants.CODIGODEMARCA = brandcode;
+		Constants.CODIGODEMARCA = brandcode;
 		// Estableciendo el lenguaje
-		Contants.LENGUAJE = languaje;
-		log.info("language select: "+Contants.LENGUAJE);
+		Constants.LENGUAJE = languaje;
+		log.info("language select: "+Constants.LENGUAJE);
 		// Codigo del hotel
-		Contants.CODIGODEHOTEL = hotelcode;
+		Constants.CODIGODEHOTEL = hotelcode;
 		//Estableciendo canal
-		Contants.CHANNEL = channel;
+		Constants.CHANNEL = channel;
 		
 		String xml = _rates.getXML();
 		log.info("<-------- Proceso finalizado getHotelRoomRates--------->");
@@ -71,21 +70,21 @@ public class ServicesRest {
 			@QueryParam("contractcodes") String contractcodes) throws PortalException, IOException, XMLStreamException {
 		log.info("<-------- Metodo getRateList Optimizado --------->");		
 		// Estableciendo el siteId del sitio
-		Contants.SITE_ID = Long.parseLong(siteID);
+		Constants.SITE_ID = Long.parseLong(siteID);
 		// Estableciendo la marca
-		Contants.CODIGODEMARCA = brandcode;
+		Constants.CODIGODEMARCA = brandcode;
 		// Estableciendo el lenguaje
-		Contants.LENGUAJE = languaje;
-		log.info("language select: "+Contants.LENGUAJE);
+		Constants.LENGUAJE = languaje;
+		log.info("language select: "+Constants.LENGUAJE);
 		// Estrableciendo contractcodes
-		Contants.validContractCodes(contractcodes);
+		Constants.validContractCodes(contractcodes);
 		// Codigo del hotel
-		Contants.CODIGODEHOTEL = hotelcode;
+		Constants.CODIGODEHOTEL = hotelcode;
 		//Estableciendo canal
-		Contants.CHANNEL = channel;
+		Constants.CHANNEL = channel;
 		//Fechas
-		Contants.CHECKINDATE = checkindate;
-		Contants.CHECKOUTDATE = checkoutdate;
+		Constants.CHECKINDATE = checkindate;
+		Constants.CHECKOUTDATE = checkoutdate;
 		
 		String xml = _rates.getXML();
 		log.info("<-------- Proceso finalizado --------->");

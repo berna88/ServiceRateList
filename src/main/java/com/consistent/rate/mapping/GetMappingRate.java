@@ -1,23 +1,19 @@
 package com.consistent.rate.mapping;
 
 import com.consistent.rate.configuration.Otherconfig;
-import com.consistent.rate.constants.Contants;
+import com.consistent.rate.constants.Constants;
 import com.consistent.rate.models.Brand;
 import com.consistent.rate.models.Content;
 import com.consistent.rate.models.Contents;
-import com.consistent.rate.models.Rate;
 import com.consistent.rate.models.Rates;
 import com.consistent.rate.sax.Mapping;
 import com.consistent.rate.sax.MarcaMapping;
 import com.consistent.rate.sax.RateMapping;
 import com.consistent.rate.util.Util;
-import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,40 +37,23 @@ import org.osgi.service.component.annotations.Modified;
 		property={"jaxrs.application=true"})
 
 public class GetMappingRate extends RateMapping{
-	private static final Log log = LogFactoryUtil.getLog(GetMappingRate.class);
-	RateMapping _util_rate=  new RateMapping();
 	
+	private static final Log log = LogFactoryUtil.getLog(GetMappingRate.class);
 	
 		// Metodo que filtra por codigo
 		public HashSet<RateMapping> getArticlesByCodeBrand() throws PortalException{
 			
-			HashSet<JournalArticle> articlesFilterCategories = getWebContentRate();// Obtiene los datos ya filtrados por query
-			
-			HashSet<JournalArticle> articlesFilterContract = new HashSet<JournalArticle>();
-			
-			
 			HashSet<RateMapping> rates = new HashSet<>();
 			
-			String locale = Contants.getLanguaje();// Contiene el lenguaje
+			String locale = Constants.getLanguaje();// Contiene el lenguaje
 			
-			log.info("Contratos: "+ Contants.CONTRACTCODES);
+			log.info("Contratos: "+ Constants.CONTRACTCODES);
 			// condicion para filtrar contratos
-			if(!Contants.CONTRACTCODES.equals("")){
-				
-				String codes = Contants.CONTRACTCODES;// vienen los contratos filtrados
-				Contants.CONTRACTCODES = "";// se restablece el valor
-				log.info("Con contratos");
+			if(!Constants.CONTRACTCODES.equals("")){
+				String codes = Constants.CONTRACTCODES;// vienen los contratos filtrados
+				Constants.CONTRACTCODES = "";// se restablece el valor
 				String[] codesSplit = codes.split(",");
-				rates = _util_rate.getWebContentRateFilter(codesSplit,locale);
-				for(JournalArticle a:articlesFilterCategories){
-					
-					for(int i = 0; i < codesSplit.length;i++)
-					{
-						if(a.getContent().contains(codesSplit[i]))
-						   {articlesFilterContract.add(a); break;}
-					}
-				}
-				rates = RatesContents(articlesFilterCategories, locale);
+				rates = getWebContentRateFilter(codesSplit,locale);
 			}else{
 				rates = getWebContentRate(locale);
 				log.info("Sin contratos");
@@ -84,7 +63,7 @@ public class GetMappingRate extends RateMapping{
 	
 	
 	public final String getXML() throws PortalException, XMLStreamException, IOException{
-		String nameBrand = Contants.getNameBrand(Contants.CODIGODEMARCA);
+		String nameBrand = Constants.getNameBrand(Constants.CODIGODEMARCA);
 		
 		
 		//Se crea el brand que contendra toda la información
@@ -99,9 +78,9 @@ public class GetMappingRate extends RateMapping{
 		//brand.setHotel();
 		
 		brand.setRates(rates2);
-		brand.setCode(Contants.CODIGODEMARCA);
-		brand.setLanguage(Contants.LENGUAJE);
-		brand.setChannel(Contants.CHANNEL);
+		brand.setCode(Constants.CODIGODEMARCA);
+		brand.setLanguage(Constants.LENGUAJE);
+		brand.setChannel(Constants.CHANNEL);
 		brand.setOrder("0");
 		brand.setName(nameBrand);
 		
@@ -125,82 +104,6 @@ public class GetMappingRate extends RateMapping{
 	}*/
 	
 
-	public final HashSet<RateMapping> RatesContents(HashSet<JournalArticle> articles, String locale) throws PortalException {
-		log.info("<------ Metodo RatesContents ------>");
-		HashSet<RateMapping> rates = new HashSet<>();
-		
-		long TInicio, TFin, tiempo;
-		TInicio = System.currentTimeMillis(); 
-		RateMapping mapping;
-		for(JournalArticle article: articles){
-			final Rate rate = new Rate();
-			//rate.setArticleId(article.getArticleId());
-			rate.setTitle(article.getTitle(locale));
-			Document document = null;
-			try {
-				
-				// Asignando valores al objeto haciendo el filtrado por el nombre de la categoria
-				document = SAXReaderUtil.read(article.getContentByLocale(locale));
-				/*log.info(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
-				log.info(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
-				log.info(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
-				log.info(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
-				log.info(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
-				log.info(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
-				log.info(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
-				log.info(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
-				log.info(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));*/
-				mapping = new RateMapping("", document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"), "", Contants.LENGUAJE, document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"), Mapping.order, Mapping.channel, document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()")); 
-				
-				/*rate.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
-				rate.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
-				rate.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
-				rate.setDescription(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
-				rate.setShortDescription(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
-				rate.setBenefits(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
-				rate.setRestrictions(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
-				rate.setCurrency(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
-				rate.setEnddate(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
-				rate.setGuid(article.getArticleId());
-				rate.setLanguage(Contants.LENGUAJE);
-				rate.setChannel("www");
-				rate.setOrder("0");
-				
-				List<Multimedia> multimedia = new ArrayList<>();
-				Multimedia multi = new Multimedia();
-				multi.setUrl(document.valueOf("//dynamic-element[@name='mediaLinkRate']/dynamic-content/text()"));
-				multi.setType("icon");
-				multimedia.add(multi);
-				
-				List<MediaLink> medialink = new ArrayList<>();
-				MediaLink link = new MediaLink();
-				link.setKeyword("rate_icon");
-				link.setType("image");
-				link.setMultimedia(multimedia);
-				medialink.add(link);
-				
-				List<MediaLinks> mediaLinks = new ArrayList<>();
-				MediaLinks links = new MediaLinks();
-				links.setMedialinks(medialink);
-				mediaLinks.add(links);
-				
-				rate.setMediaLinks(mediaLinks);*/
-				rates.add(mapping);
-				
-				
-				
-			} catch (Exception e) {
-				// TODO: handle exception
-				log.error("Error de mapeo de rates: "+e.getMessage());
-			}
-		}
-		TFin = System.currentTimeMillis();
-		tiempo = TFin - TInicio; //Calculamos los milisegundos de diferencia
-		log.info("Fin de proceso de parseo de datos " + tiempo); 
-		log.info("Finalizacion de parseo");
-		return rates;
-	}
-	
 	@Activate
 	@Modified
 	public void activate(Map<String, Object> properties) {
@@ -209,28 +112,28 @@ public class GetMappingRate extends RateMapping{
 				
 		if (_restConfigurationApi != null) {
 			if(_restConfigurationApi.structureHotelId()!=0){
-				Contants.STRUCTURE_HOTEL_ID =_restConfigurationApi.structureHotelId();
-				log.info("Estructura de hotel localizada="+Contants.STRUCTURE_HOTEL_ID);
+				Constants.STRUCTURE_HOTEL_ID =_restConfigurationApi.structureHotelId();
+				log.info("Estructura de hotel localizada="+Constants.STRUCTURE_HOTEL_ID);
 			}
 			else{
-				Contants.STRUCTURE_HOTEL_ID = new Long(1516944);
-				log.info("For sample DXP REST config, info="+Contants.STRUCTURE_HOTEL_ID);
+				Constants.STRUCTURE_HOTEL_ID = new Long(1516944);
+				log.info("For sample DXP REST config, info="+Constants.STRUCTURE_HOTEL_ID);
 			}
 			if(_restConfigurationApi.structureRatesId()!=0){
-				Contants.STRUCTURE_RATE_ID =_restConfigurationApi.structureRatesId();
-				log.info("For sample DXP REST config, info="+Contants.STRUCTURE_RATE_ID);
+				Constants.STRUCTURE_RATE_ID =_restConfigurationApi.structureRatesId();
+				log.info("For sample DXP REST config, info="+Constants.STRUCTURE_RATE_ID);
 			}
 			else{
-				Contants.STRUCTURE_RATE_ID = new Long(1516944);
-				log.info("For sample DXP REST config, info="+Contants.STRUCTURE_RATE_ID);
+				Constants.STRUCTURE_RATE_ID = new Long(1516944);
+				log.info("For sample DXP REST config, info="+Constants.STRUCTURE_RATE_ID);
 			}
 			if(_restConfigurationApi.folderId()!=0){
-				Contants.FOLDER_ID =_restConfigurationApi.folderId();
-				log.info("For sample DXP REST config, info="+Contants.FOLDER_ID);
+				Constants.FOLDER_ID =_restConfigurationApi.folderId();
+				log.info("For sample DXP REST config, info="+Constants.FOLDER_ID);
 			}
 			else{
-				Contants.FOLDER_ID = new Long(1516944);
-				log.info("For sample DXP REST config, info="+Contants.FOLDER_ID);
+				Constants.FOLDER_ID = new Long(1516944);
+				log.info("For sample DXP REST config, info="+Constants.FOLDER_ID);
 			}
 			} else {
 			System.out.println("The sample DXP REST config object is not yet initialized");

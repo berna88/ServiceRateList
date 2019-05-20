@@ -1,6 +1,6 @@
 package com.consistent.rate.util;
 
-import com.consistent.rate.constants.Contants;
+import com.consistent.rate.constants.Constants;
 import com.consistent.rate.mapping.GetMappingHotel;
 import com.consistent.rate.mapping.RoomMapping;
 import com.consistent.rate.models.hotel.Hotel;
@@ -36,11 +36,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
+
 public class Util extends Portal{
 	
 	private static final Log log = LogFactoryUtil.getLog(Util.class);
 	static String marca = "";
-	
 	
 	//Metodo que obtienes todos los hoteles
 	public static HashSet<Hotel> getHotels() throws PortalException{
@@ -51,24 +53,24 @@ public class Util extends Portal{
 		
 		try {
 			//Obtiene el Id de la estructura
-		    DDMStructure results = DDMStructureLocalServiceUtil.getStructure(Contants.STRUCTURE_HOTEL_ID);
+		    DDMStructure results = DDMStructureLocalServiceUtil.getStructure(Constants.STRUCTURE_HOTEL_ID);
 			log.info("Estructura: "+results.getStructureKey());
 			//Obtiene el Id de la carpeta 
-			JournalFolder folder = JournalFolderLocalServiceUtil.fetchFolder(Contants.SITE_ID, Contants.FOLDER_ID, Contants.CODIGODEMARCA);
+			JournalFolder folder = JournalFolderLocalServiceUtil.fetchFolder(Constants.SITE_ID, Constants.FOLDER_ID, Constants.CODIGODEMARCA);
 			long folderId = folder.getFolderId();
 			log.info("Folder id: "+folderId);
 			DynamicQuery dynamicQueryJournal = DynamicQueryFactoryUtil.forClass(JournalArticleImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
 			dynamicQueryJournal.add(PropertyFactoryUtil.forName("DDMStructureKey").eq(results.getStructureKey()));
-			dynamicQueryJournal.add(PropertyFactoryUtil.forName("groupId").eq(new Long(Contants.SITE_ID)));
+			dynamicQueryJournal.add(PropertyFactoryUtil.forName("groupId").eq(new Long(Constants.SITE_ID)));
 			dynamicQueryJournal.add(PropertyFactoryUtil.forName("treePath").like("%"+folderId+"%"));
 			final HashSet<JournalArticle> journalArticles = new HashSet<JournalArticle>(JournalArticleLocalServiceUtil.dynamicQuery(dynamicQueryJournal));
 			for (JournalArticle journal : journalArticles) {
 				if(!journal.isInTrash()){
-					if(JournalArticleLocalServiceUtil.isLatestVersion(Contants.SITE_ID, journal.getArticleId(), journal.getVersion(),WorkflowConstants.STATUS_APPROVED)){
-						 content.HotelContentsMapping(journal, Contants.getLanguaje());
-						 mapping = getHotelRooms(content,Contants.CODIGODEMARCA.toLowerCase().toString(),Contants.getLanguaje(),Contants.SITE_ID);
-						 if(Contants.CODIGODEHOTEL!=null){
-							 if(mapping.getCode().equalsIgnoreCase(Contants.CODIGODEHOTEL)){
+					if(JournalArticleLocalServiceUtil.isLatestVersion(Constants.SITE_ID, journal.getArticleId(), journal.getVersion(),WorkflowConstants.STATUS_APPROVED)){
+						 content.HotelContentsMapping(journal, Constants.getLanguaje());
+						 mapping = getHotelRooms(content,Constants.CODIGODEMARCA.toLowerCase().toString(),Constants.getLanguaje(),Constants.SITE_ID);
+						 if(Constants.CODIGODEHOTEL!=null){
+							 if(mapping.getCode().equalsIgnoreCase(Constants.CODIGODEHOTEL)){
 								 log.info("Codigo de hotel: "+mapping.getCode());
 								 hotels.add(mapping);
 							 }
@@ -142,8 +144,8 @@ public class Util extends Portal{
 					
 					List<DDMStructure> ddmStructures = new ArrayList<>();
 					if(ddmStructures==null || ddmStructures.size() < 1){
-					if(getStruct("%>"+Contants.NAME_STRUCTURE_DEFAULT+"<%",siteID).size() > 0){
-						ddmStructures= getStruct("%>"+Contants.NAME_STRUCTURE_DEFAULT+"<%",siteID);
+					if(getStruct("%>"+Constants.NAME_STRUCTURE_DEFAULT+"<%",siteID).size() > 0){
+						ddmStructures= getStruct("%>"+Constants.NAME_STRUCTURE_DEFAULT+"<%",siteID);
 					}
 					}
 
@@ -223,7 +225,7 @@ public class Util extends Portal{
 					hote.setCode(content.getHotelCode());
 					hote.setName(content.getName());
 					hote.setTitle(content.getTitle());
-					hote.setLanguage(Contants.LENGUAJE);
+					hote.setLanguage(Constants.LENGUAJE);
 					hote.setKeyword(content.getMetaTags().toString());
 					hote.setShortDescription(content.getShortDescription());
 					hote.setDescription(content.getDescription());
@@ -354,7 +356,7 @@ public class Util extends Portal{
 						rom.setCode(ro.getCode());
 						rom.setName(ro.getName());
 						rom.setTitle(ro.getTitle());
-						rom.setLanguage(Contants.LENGUAJE);
+						rom.setLanguage(Constants.LENGUAJE);
 						rom.setKeyword(ro.getKeywords());
 						rom.setShortDescription(ro.getDescriptions().toString());
 						rom.setDescription(ro.getDescriptions().toString());
@@ -388,8 +390,8 @@ public class Util extends Portal{
 						}
 			  	
 			  
-			  /*	
-			  	private static boolean getIntervals(String i, String f, String date){
+			  	
+			  	public static boolean getIntervals(String i, String f, String date){
 					
 					boolean estado = false;
 					try {
@@ -406,7 +408,7 @@ public class Util extends Portal{
 							e.getStackTrace();
 						}
 					return estado;
-				}*/
+				}
 			  
 }
 

@@ -2,7 +2,7 @@ package com.consistent.rate.singleton;
 
 import java.util.List;
 
-import com.consistent.rate.constants.Contants;
+import com.consistent.rate.constants.Constants;
 import com.consistent.rate.util.Util;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetVocabulary;
@@ -20,8 +20,8 @@ public abstract class Portal {
 	
 	protected Long getVocabularyId(){
 		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(AssetVocabulary.class, "Vocabulary", PortalClassLoaderUtil.getClassLoader());
-		dynamicQuery.add(PropertyFactoryUtil.forName("name").eq(Contants.MARCAS));
-		dynamicQuery.add(PropertyFactoryUtil.forName("groupId").eq(Contants.SITE_ID));
+		dynamicQuery.add(PropertyFactoryUtil.forName("name").eq(Constants.MARCAS));
+		dynamicQuery.add(PropertyFactoryUtil.forName("groupId").eq(Constants.SITE_ID));
 		Long vocabularyId = null;
 		try {
 			List<AssetVocabulary> vocabularies = AssetVocabularyLocalServiceUtil.dynamicQuery(dynamicQuery);
@@ -38,7 +38,7 @@ public abstract class Portal {
 		Long vocabularyId = getVocabularyId();
 		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(AssetCategory.class, "category", PortalClassLoaderUtil.getClassLoader());
 		dynamicQuery.add(PropertyFactoryUtil.forName("vocabularyId").eq(vocabularyId));
-		dynamicQuery.add(PropertyFactoryUtil.forName("groupId").eq(Contants.SITE_ID));
+		dynamicQuery.add(PropertyFactoryUtil.forName("groupId").eq(Constants.SITE_ID));
 		dynamicQuery.add(PropertyFactoryUtil.forName("name").eq(marca));
 		Long categoryId = null;
 		try {

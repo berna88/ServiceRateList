@@ -8,8 +8,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 
-public class Contants {
-	private static final Log log = LogFactoryUtil.getLog(Contants.class);
+public class Constants {
+	private static final Log log = LogFactoryUtil.getLog(Constants.class);
 	
 	// SANITIZE
 	public static int SANITIZE = 0;
@@ -67,7 +67,7 @@ public class Contants {
 		}
 	// ValidContractCodes
 		public static void validContractCodes(String contractcodes){
-			System.out.println("contractcodes:"+contractcodes);
+			log.info("contractcodes:"+contractcodes);
 			if(contractcodes != null && !contractcodes.isEmpty()){
 				CONTRACTCODES = contractcodes;
 			}else {
