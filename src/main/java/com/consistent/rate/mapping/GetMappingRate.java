@@ -17,7 +17,6 @@ import com.consistent.rate.constants.Constants;
 import com.consistent.rate.sax.Mapping;
 import com.consistent.rate.sax.MarcaMapping;
 import com.consistent.rate.sax.RateMapping;
-import com.consistent.rate.util.Util;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -47,7 +46,6 @@ public class GetMappingRate extends RateMapping{
 		Mapping mapping = new MarcaMapping("", Constants.CODIGODEMARCA, Constants.getNameBrand(Constants.CODIGODEMARCA), "", Constants.LENGUAJE, rates);
 		//List<Rates> rates2 = new ArrayList<>();
 		//rates2.add(new Rates(rates));
-		Util.getHotels();
 		//brand.setHotel();
 		/*
 		brand.setRates(rates2);

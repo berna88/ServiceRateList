@@ -44,58 +44,7 @@ public class Util extends Portal{
 	private static final Log log = LogFactoryUtil.getLog(Util.class);
 	static String marca = "";
 	
-	//Metodo que obtienes todos los hoteles
-	public static HashSet<Hotel> getHotels() throws PortalException{
-		GetMappingHotel content = new GetMappingHotel();
-		Hotel mapping = new Hotel();
-		
-		final HashSet<Hotel> hotels = new HashSet<>();
-		
-		try {
-			//Obtiene el Id de la estructura
-		    DDMStructure results = DDMStructureLocalServiceUtil.getStructure(Constants.STRUCTURE_HOTEL_ID);
-			log.info("Estructura: "+results.getStructureKey());
-			//Obtiene el Id de la carpeta 
-			JournalFolder folder = JournalFolderLocalServiceUtil.fetchFolder(Constants.SITE_ID, Constants.FOLDER_ID, Constants.CODIGODEMARCA);
-			long folderId = folder.getFolderId();
-			log.info("Folder id: "+folderId);
-			DynamicQuery dynamicQueryJournal = DynamicQueryFactoryUtil.forClass(JournalArticleImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
-			dynamicQueryJournal.add(PropertyFactoryUtil.forName("DDMStructureKey").eq(results.getStructureKey()));
-			dynamicQueryJournal.add(PropertyFactoryUtil.forName("groupId").eq(new Long(Constants.SITE_ID)));
-			dynamicQueryJournal.add(PropertyFactoryUtil.forName("treePath").like("%"+folderId+"%"));
-			final HashSet<JournalArticle> journalArticles = new HashSet<JournalArticle>(JournalArticleLocalServiceUtil.dynamicQuery(dynamicQueryJournal));
-			for (JournalArticle journal : journalArticles) {
-				if(!journal.isInTrash()){
-					if(JournalArticleLocalServiceUtil.isLatestVersion(Constants.SITE_ID, journal.getArticleId(), journal.getVersion(),WorkflowConstants.STATUS_APPROVED)){
-						 content.HotelContentsMapping(journal, Constants.getLanguaje());
-						 mapping = getHotelRooms(content,Constants.CODIGODEMARCA.toLowerCase().toString(),Constants.getLanguaje(),Constants.SITE_ID);
-						 if(Constants.CODIGODEHOTEL!=null){
-							 if(mapping.getCode().equalsIgnoreCase(Constants.CODIGODEHOTEL)){
-								 log.info("Codigo de hotel: "+mapping.getCode());
-								 hotels.add(mapping);
-							 }
-						 }else{
-							 hotels.add(mapping);
-						 }
-						 
-					   	}
-				}
-				 
-			}
-			log.info("Total de hoteles: "+hotels.size());
-		}  catch (IndexOutOfBoundsException ie) {
-			log.error("El nombre de la carpeta Hotel No coincide");
-			log.error("Causa: " + ie.getCause());
-			ie.fillInStackTrace();
-		} catch (NoSuchStructureException e) {
-			log.error("La estructura no existe");
-			log.error("Causa: " + e.getCause());
-		}catch (NullPointerException e) {
-			log.error("El nombre de la Marca");
-			log.error("Causa: " + e.getCause());
-		}
-		return hotels;
-	}
+	
 	
 		//obteniendo subcategorias
 				public void getSubCategory(){
