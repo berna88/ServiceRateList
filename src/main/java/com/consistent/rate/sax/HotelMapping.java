@@ -2,7 +2,6 @@ package com.consistent.rate.sax;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -11,8 +10,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import com.consistent.rate.constants.Constants;
-import com.consistent.rate.mapping.GetMappingHotel;
-import com.consistent.rate.models.hotel.Hotel;
+import com.consistent.rate.singleton.Portal;
 import com.liferay.dynamic.data.mapping.exception.NoSuchStructureException;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
@@ -25,10 +23,6 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
@@ -37,7 +31,7 @@ import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
-public class HotelMapping implements Mapping{
+public class HotelMapping extends Portal implements Mapping{
 	
 	private static final Log log = LogFactoryUtil.getLog(HotelMapping.class);
 	
@@ -510,13 +504,10 @@ public class HotelMapping implements Mapping{
 	}
 	
 	//Metodo que obtienes todos los hoteles
-	public HashSet<Hotel> getHotels() throws PortalException{
+	public HashSet<String> getHotels() throws PortalException, XMLStreamException, IOException{
 		
-			HashSet<HotelMapping> content = new HashSet<>();
-			Hotel mapping = new Hotel();
-			
 			final HashSet<String> hotels = new HashSet<>();
-			
+				
 			try {
 				//Obtiene el Id de la estructura
 			    DDMStructure results = DDMStructureLocalServiceUtil.getStructure(Constants.STRUCTURE_HOTEL_ID);
@@ -525,29 +516,34 @@ public class HotelMapping implements Mapping{
 				JournalFolder folder = JournalFolderLocalServiceUtil.fetchFolder(Constants.SITE_ID, Constants.FOLDER_ID, Constants.CODIGODEMARCA);
 				long folderId = folder.getFolderId();
 				log.info("Folder id: "+folderId);
-				DynamicQuery dynamicQueryJournal = DynamicQueryFactoryUtil.forClass(JournalArticleImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
-				dynamicQueryJournal.add(PropertyFactoryUtil.forName("DDMStructureKey").eq(results.getStructureKey()));
-				dynamicQueryJournal.add(PropertyFactoryUtil.forName("groupId").eq(new Long(Constants.SITE_ID)));
-				dynamicQueryJournal.add(PropertyFactoryUtil.forName("treePath").like("%"+folderId+"%"));
-				final HashSet<JournalArticle> journalArticles = new HashSet<JournalArticle>(JournalArticleLocalServiceUtil.dynamicQuery(dynamicQueryJournal));
-				for (JournalArticle journal : journalArticles) {
-					if(!journal.isInTrash()){
-						if(JournalArticleLocalServiceUtil.isLatestVersion(Constants.SITE_ID, journal.getArticleId(), journal.getVersion(),WorkflowConstants.STATUS_APPROVED)){
-							 content.add(HotelContentsMapping(journal, Constants.getLanguaje()));
-							 //mapping = getHotelRooms(content,Constants.CODIGODEMARCA.toLowerCase().toString(),Constants.getLanguaje(),Constants.SITE_ID);
-							 if(Constants.CODIGODEHOTEL!=null){
-								 if(mapping.getCode().equalsIgnoreCase(Constants.CODIGODEHOTEL)){
-									 log.info("Codigo de hotel: "+mapping.getCode());
-									 hotels.add(mapping);
-								 }
-							 }else{
-								 hotels.add(mapping);
-							 }
-							 
-						   	}
+				
+				if(!Constants.CODIGODEHOTEL.isEmpty()){
+					DynamicQuery dynamicQueryJournal = DynamicQueryFactoryUtil.forClass(JournalArticleImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
+					dynamicQueryJournal.add(PropertyFactoryUtil.forName("DDMStructureKey").eq(results.getStructureKey()));
+					dynamicQueryJournal.add(PropertyFactoryUtil.forName("groupId").eq(new Long(Constants.SITE_ID)));
+					dynamicQueryJournal.add(PropertyFactoryUtil.forName("folderId").eq(getFolderId(Constants.CODIGODEHOTEL)));
+					final HashSet<JournalArticle> journalArticles = new HashSet<JournalArticle>(JournalArticleLocalServiceUtil.dynamicQuery(dynamicQueryJournal));
+					for (JournalArticle journal : journalArticles) {
+							if(JournalArticleLocalServiceUtil.isLatestVersion(Constants.SITE_ID, journal.getArticleId(), journal.getVersion(),WorkflowConstants.STATUS_APPROVED) && !journal.isInTrash()){
+								hotels.add(HotelContentsMapping(journal, Constants.getLanguaje()));
+								//hotels.add(journal.toString());
+							} 
 					}
-					 
+				}else{
+					DynamicQuery dynamicQueryJournal = DynamicQueryFactoryUtil.forClass(JournalArticleImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
+					dynamicQueryJournal.add(PropertyFactoryUtil.forName("DDMStructureKey").eq(results.getStructureKey()));
+					dynamicQueryJournal.add(PropertyFactoryUtil.forName("groupId").eq(new Long(Constants.SITE_ID)));
+					dynamicQueryJournal.add(PropertyFactoryUtil.forName("treePath").like("%"+folderId+"%"));
+					final HashSet<JournalArticle> journalArticles = new HashSet<JournalArticle>(JournalArticleLocalServiceUtil.dynamicQuery(dynamicQueryJournal));
+					for (JournalArticle journal : journalArticles) {
+							if(JournalArticleLocalServiceUtil.isLatestVersion(Constants.SITE_ID, journal.getArticleId(), journal.getVersion(),WorkflowConstants.STATUS_APPROVED) && !journal.isInTrash()){
+								hotels.add(HotelContentsMapping(journal, Constants.getLanguaje()));
+								//hotels.add(journal.toString());
+							} 
+					}
 				}
+				
+				
 				log.info("Total de hoteles: "+hotels.size());
 			}  catch (IndexOutOfBoundsException ie) {
 				log.error("El nombre de la carpeta Hotel No coincide");
@@ -593,7 +589,7 @@ public class HotelMapping implements Mapping{
 	         xMLStreamWriter.writeEndElement();
 	     	
 	         
-		    xMLStreamWriter.writeStartElement("keyword");
+		    /*xMLStreamWriter.writeStartElement("keyword");
 	        xMLStreamWriter.writeCharacters(getMetaTags().toString());
 	        xMLStreamWriter.writeEndElement();
 	        xMLStreamWriter.writeStartElement("shortDescription");
@@ -607,13 +603,13 @@ public class HotelMapping implements Mapping{
 	        xMLStreamWriter.writeEndElement();
 	        xMLStreamWriter.writeStartElement("channel");
 	        xMLStreamWriter.writeCharacters("www");
-	        xMLStreamWriter.writeEndElement();
+	        xMLStreamWriter.writeEndElement();*/
 			
 	        
 	        
 	      
 	      //telephone section
-	        xMLStreamWriter.writeStartElement("telephones");
+	       /* xMLStreamWriter.writeStartElement("telephones");
 	        for (String phone : getPhones()) {
 	        	if(!phone.equals("{}")){
 	            xMLStreamWriter.writeStartElement("telephone");
@@ -629,7 +625,7 @@ public class HotelMapping implements Mapping{
 		        xMLStreamWriter.writeEndElement();
 	        	}
 			}
-	        xMLStreamWriter.writeEndElement();
+	        xMLStreamWriter.writeEndElement();*/
 	        //telephone section
 	          
 	        //location section
@@ -665,7 +661,7 @@ public class HotelMapping implements Mapping{
 	         //location section
 	         
 	         /*mediaLink section*/
-	         JSONArray ArrayMediaLinks = JSONFactoryUtil.createJSONArray();
+	         /*JSONArray ArrayMediaLinks = JSONFactoryUtil.createJSONArray();
 	         List<String> MeliaLinkList = getMediaLinks();
 				for (String mediaLinkItem : MeliaLinkList) {
 					JSONObject myObject;
@@ -698,7 +694,7 @@ public class HotelMapping implements Mapping{
 				         xMLStreamWriter.writeStartElement("type");
 				         xMLStreamWriter.writeEndElement();
 			      xMLStreamWriter.writeEndElement();
-	         xMLStreamWriter.writeEndElement();
+	         xMLStreamWriter.writeEndElement();*/
 	          //mediaLink section
 	         
 	         /*destinations
@@ -735,7 +731,7 @@ public class HotelMapping implements Mapping{
 	         //destinations
 	       */
 		    //AlternativeHotels
-		    List<String> alternatives = getAlternativeHotels();
+		    /*List<String> alternatives = getAlternativeHotels();
 		    xMLStreamWriter.writeStartElement("alternatehotels");
 			List<String> cos=null;
 			for (String alternative : alternatives) {
@@ -764,7 +760,7 @@ public class HotelMapping implements Mapping{
 					xMLStreamWriter.writeCharacters(alter);
 					xMLStreamWriter.writeEndElement();	
 				}	
-			}
+			}*/
 		    xMLStreamWriter.writeEndElement();	
 			//AlternativeHotels	
 			//Root 
@@ -800,20 +796,68 @@ public class HotelMapping implements Mapping{
 		this.name = "";
 	}
 	
-	public HotelMapping HotelContentsMapping(JournalArticle content, String locale){
+	private String HotelContentsMapping(JournalArticle content, String locale) throws XMLStreamException, IOException{
 		
 		HotelMapping hotelMapping = new HotelMapping();
 		Document docXML=null;
 	        try {
 				docXML = SAXReaderUtil.read(content.getContentByLocale(locale));
-				hotelCode=docXML.valueOf("//dynamic-element[@name='codeHotel']/dynamic-content/text()");
-				name=docXML.valueOf("//dynamic-element[@name='nameHotel']/dynamic-content/text()");
-				hotelMapping = new HotelMapping(content.getArticleId(),content.getTitle(locale),docXML.valueOf("//dynamic-element[@name='codeHotel']/dynamic-content/text()"),docXML.valueOf("//dynamic-element[@name='nameHotel']/dynamic-content/text()"));
+				hotelMapping = new HotelMapping();
+				hotelMapping.setArticleId(content.getArticleId());
+				hotelMapping.setTitle(content.getTitle(locale));
+				hotelMapping.setHotelCode(docXML.valueOf("//dynamic-element[@name='codeHotel']/dynamic-content/text()"));
+				hotelMapping.setName(docXML.valueOf("//dynamic-element[@name='nameHotel']/dynamic-content/text()"));
+				//List<Node> roomLinkNodes = docXML.selectNodes("//dynamic-element[@name='roomLinksHotel']/dynamic-element");		
 				
+				/*JSONArray ArrayRoom = JSONFactoryUtil.createJSONArray();
+				for(Node roomLinkNode : roomLinkNodes){				
+					String valor= roomLinkNode.valueOf("dynamic-content/text()");
+					if(!valor.trim().equals("")){
+						JSONObject object=null;
+						try {
+							object=JSONFactoryUtil.createJSONObject(valor);
+							String classpk=object.getString("classPk");
+							if(com.liferay.portal.kernel.util.Validator.isNotNull(classpk)){
+								
+								
+								
+							}
+							
+							
+						} catch (JSONException e) {
+							log.error("ERROR AL OBTENER JSON",e);
+						}					
+						ArrayRoom.put(object);
+						}			
+	            }*/
+							
 	        }catch (DocumentException e) {
 				log.error("ERROR to get XML",e);
 			}
-	        return hotelMapping;
+	        return hotelMapping.getMapping();
 	        
 	}
+	/*private String getJournalArticleByClassPk(Long classPk,String laguage,Long siteID){
+		 DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(com.liferay.journal.model.impl.JournalArticleImpl.class, "journal",PortalClassLoaderUtil.getClassLoader());			
+		 dynamicQuery.add((PropertyFactoryUtil.forName("resourcePrimKey").eq(classPk)));
+     	 dynamicQuery.add(RestrictionsFactoryUtil.eq("groupId",Constants.SITE_ID));
+		 HashSet<com.liferay.journal.model.impl.JournalArticleImpl> ja= new HashSet<>(JournalArticleLocalServiceUtil.dynamicQuery(dynamicQuery));
+		 Document docXML=null;
+			for (JournalArticleImpl journalArticleImpl : ja) {
+				try {
+					if(JournalArticleLocalServiceUtil.isLatestVersion(Constants.SITE_ID, journalArticleImpl.getArticleId(), journalArticleImpl.getVersion(),WorkflowConstants.STATUS_APPROVED) && !journalArticleImpl.isInTrash()){
+							docXML = SAXReaderUtil.read(journalArticleImpl.getContentByLocale(laguage));
+					}
+				} catch (PortalException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (DocumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			return "";
+			}*/
+	
 }
+

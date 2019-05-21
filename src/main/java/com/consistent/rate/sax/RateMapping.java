@@ -22,6 +22,9 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
+
 public class RateMapping extends Portal implements Mapping{
 	
 	private static final Log log = LogFactoryUtil.getLog(RateMapping.class);
@@ -34,8 +37,8 @@ public class RateMapping extends Portal implements Mapping{
 	private String keyword;
 	private String shortDescription;
 	private String description;
-	private String order;
-	private String channel;
+	private String order = Mapping.order;
+	private String channel = Mapping.channel;
 	private String benefits;
 	private String restrictions;
 	private String enddate;
@@ -208,7 +211,6 @@ public class RateMapping extends Portal implements Mapping{
 	}
 	
 	public RateMapping(){
-		
 		this.code = "";
 		this.name = "";
 		this.title = "";
@@ -216,8 +218,6 @@ public class RateMapping extends Portal implements Mapping{
 		this.keyword = "";
 		this.shortDescription = "";
 		this.description = "";
-		this.order = "";
-		this.channel = "";
 		this.benefits = "";
 		this.restrictions = "";
 		this.enddate = "";
@@ -225,7 +225,7 @@ public class RateMapping extends Portal implements Mapping{
 	}
 	
 	public RateMapping(String guid, String code, String name, String title, String language, String keyword,
-			String shortDescription, String description, String order, String channel, String benefits,
+			String shortDescription, String description, String benefits,
 			String restrictions, String enddate, String currency) {
 		super();
 		this.guid = guid;
@@ -236,8 +236,6 @@ public class RateMapping extends Portal implements Mapping{
 		this.keyword = keyword;
 		this.shortDescription = shortDescription;
 		this.description = description;
-		this.order = order;
-		this.channel = channel;
 		this.benefits = benefits;
 		this.restrictions = restrictions;
 		this.enddate = enddate;
@@ -331,7 +329,7 @@ public class RateMapping extends Portal implements Mapping{
 		assetEntryQuery.setClassName("com.liferay.journal.model.JournalArticle");
 		final HashSet<AssetEntry> assetEntryList = new HashSet<AssetEntry>(AssetEntryLocalServiceUtil.getEntries(assetEntryQuery));//convirtiendo la lista en hashSet
 		log.info("Tamaño de elemento por categorias: "+assetEntryList.size());
-		RateMapping mapping;
+		RateMapping mapping = new RateMapping();
 		try {
 			for (AssetEntry ae : assetEntryList) {
 				// JournalArticleResource journalArticleResource = JournalArticleResourceLocalServiceUtil.getJournalArticleResource(ae.getClassPK());
@@ -343,22 +341,42 @@ public class RateMapping extends Portal implements Mapping{
 								Document document = null;
 								
 								document = SAXReaderUtil.read(journalArticle.getContentByLocale(locale));
-									//log.info("fecha: "+document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
-									//log.info(Util.getIntervals(Constants.CHECKINDATE, Constants.CHECKOUTDATE, document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()")));
-									mapping = new RateMapping("", document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"), "", Constants.LENGUAJE, document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"), Mapping.order, Mapping.channel, document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()")); 
-									/*rate.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
-									rate.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
-									rate.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
-									rate.setDescription(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
-									rate.setShortDescription(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
-									rate.setBenefits(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
-									rate.setRestrictions(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
-									rate.setCurrency(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
-									rate.setEnddate(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
-									rate.setGuid(journalArticle.getArticleId());
-									rate.setLanguage(Contants.LENGUAJE);
-									rate.setChannel("www");
-									rate.setOrder("0");
+									
+									if(!Constants.CHECKINDATE.isEmpty() && !Constants.CHECKOUTDATE.isEmpty()){
+										//log.info("fecha: "+document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
+										//log.info(getIntervals(Constants.CHECKINDATE, Constants.CHECKOUTDATE, document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()")));
+										if(getIntervals(Constants.CHECKINDATE, Constants.CHECKOUTDATE, document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"))){
+											mapping = new RateMapping(); 
+											mapping.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
+											mapping.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
+											mapping.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
+											mapping.setDescription(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
+											mapping.setShortDescription(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
+											mapping.setBenefits(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
+											mapping.setRestrictions(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
+											mapping.setCurrency(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
+											mapping.setEnddate(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
+											mapping.setGuid(journalArticle.getArticleId());
+											mapping.setLanguage(Constants.LENGUAJE);
+										}
+									}else{
+										log.info("No tienen filtros");
+										
+										mapping = new RateMapping(); 
+										mapping.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
+										mapping.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
+										mapping.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
+										mapping.setDescription(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
+										mapping.setShortDescription(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
+										mapping.setBenefits(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
+										mapping.setRestrictions(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
+										mapping.setCurrency(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
+										mapping.setEnddate(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
+										mapping.setGuid(journalArticle.getArticleId());
+										mapping.setLanguage(Constants.LENGUAJE);
+									}
+									
+									/*
 									
 									List<Multimedia> multimedia = new ArrayList<>();
 									Multimedia multi = new Multimedia();
@@ -420,22 +438,19 @@ public class RateMapping extends Portal implements Mapping{
 								Document document = null;
 								document = SAXReaderUtil.read(journalArticle.getContentByLocale(locale));
 								
-								mapping = new RateMapping("", document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"), "", Constants.LENGUAJE, document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"), Mapping.order, Mapping.channel, document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"), document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()")); 
-								
-								/*rate.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
-								rate.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
-								rate.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
-								rate.setDescription(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
-								rate.setShortDescription(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
-								rate.setBenefits(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
-								rate.setRestrictions(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
-								rate.setCurrency(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
-								rate.setEnddate(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
-								rate.setGuid(journalArticle.getArticleId());
-								rate.setLanguage(Contants.LENGUAJE);
-								rate.setChannel("www");
-								rate.setOrder("0");
-								
+								mapping = new RateMapping(); 
+								mapping.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
+								mapping.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
+								mapping.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
+								mapping.setDescription(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
+								mapping.setShortDescription(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
+								mapping.setBenefits(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
+								mapping.setRestrictions(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
+								mapping.setCurrency(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
+								mapping.setEnddate(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
+								mapping.setGuid(journalArticle.getArticleId());
+								mapping.setLanguage(Constants.LENGUAJE);
+								/*
 								List<Multimedia> multimedia = new ArrayList<>();
 								Multimedia multi = new Multimedia();
 								multi.setUrl(document.valueOf("//dynamic-element[@name='mediaLinkRate']/dynamic-content/text()"));
@@ -488,6 +503,28 @@ public class RateMapping extends Portal implements Mapping{
 				}
 				return rates;
 			}
-
+	
+	private boolean getIntervals(String i, String f, String date){
+		
+		boolean estado = false;
+		try {
+			String d = date.replace('/','-');
+			String init = i.replace('/','-');
+			String end = f.replace('/','-');
+			String fi = (end.equals(""))? DateTime.now().toString():end;
+			DateTime inicio = new DateTime(init);
+			DateTime fin = new DateTime(fi);
+			Interval interval = new Interval(inicio, fin);
+			if(d.equals("")){
+				estado = true;
+			}
+			estado = interval.contains(new DateTime(d));
+			
+			} catch (IllegalArgumentException e) {
+			// TODO: handle exception
+				e.getStackTrace();
+			}
+		return estado;
+	}
 	
 }

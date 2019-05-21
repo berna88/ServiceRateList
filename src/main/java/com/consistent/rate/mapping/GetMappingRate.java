@@ -14,6 +14,7 @@ import org.osgi.service.component.annotations.Modified;
 
 import com.consistent.rate.configuration.Otherconfig;
 import com.consistent.rate.constants.Constants;
+import com.consistent.rate.sax.HotelMapping;
 import com.consistent.rate.sax.Mapping;
 import com.consistent.rate.sax.MarcaMapping;
 import com.consistent.rate.sax.RateMapping;
@@ -43,7 +44,8 @@ public class GetMappingRate extends RateMapping{
 		
 		// Se iteran los rates para la inserción en marca
 		HashSet<RateMapping> rates = getArticlesByCodeBrand();
-		Mapping mapping = new MarcaMapping("", Constants.CODIGODEMARCA, Constants.getNameBrand(Constants.CODIGODEMARCA), "", Constants.LENGUAJE, rates);
+		HotelMapping hotels = new HotelMapping();
+		Mapping mapping = new MarcaMapping("", Constants.CODIGODEMARCA, Constants.getNameBrand(Constants.CODIGODEMARCA), "", Constants.LENGUAJE, rates, hotels.getHotels());
 		//List<Rates> rates2 = new ArrayList<>();
 		//rates2.add(new Rates(rates));
 		//brand.setHotel();

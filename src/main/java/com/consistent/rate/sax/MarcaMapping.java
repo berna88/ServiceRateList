@@ -8,6 +8,8 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import com.liferay.portal.kernel.exception.PortalException;
+
 
 public class MarcaMapping implements Mapping{
 	//private static final Log log = LogFactoryUtil.getLog(MarcaMapping.class);
@@ -17,6 +19,7 @@ public class MarcaMapping implements Mapping{
 	protected String title;
 	protected String language;
 	protected HashSet<RateMapping> rateMapping;
+	protected HashSet<String> hotels;
 	
 	
 	
@@ -28,6 +31,16 @@ public class MarcaMapping implements Mapping{
 		this.title = title;
 		this.language = language;
 		this.rateMapping = rateMapping;
+	}
+	public MarcaMapping(String guid, String code, String name, String title, String language, HashSet<RateMapping> rateMapping, HashSet<String> hotels) {
+		super();
+		this.guid = guid;
+		this.code = code;
+		this.name = name;
+		this.title = title;
+		this.language = language;
+		this.rateMapping = rateMapping;
+		this.hotels = hotels;
 	}
 	public MarcaMapping() {
 		super();
@@ -125,7 +138,7 @@ public class MarcaMapping implements Mapping{
 
 
 	@Override
-	public String getMapping() throws XMLStreamException, IOException {
+	public String getMapping() throws XMLStreamException, IOException, PortalException {
 		StringWriter stringWriter = new StringWriter();
 		XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
 		XMLStreamWriter xMLStreamWriter = xmlOutputFactory.createXMLStreamWriter(stringWriter);
@@ -163,6 +176,10 @@ public class MarcaMapping implements Mapping{
 								xMLStreamWriter.writeCharacters(rateMappingR.getMapping());
 							}
 						xMLStreamWriter.writeEndElement();//rates
+						for (String hotel : hotels) {
+							xMLStreamWriter.writeCharacters(hotel);
+						}
+						
 					xMLStreamWriter.writeEndElement();//brand
 				xMLStreamWriter.writeEndElement();//content
 			xMLStreamWriter.writeEndElement();//contents

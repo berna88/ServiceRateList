@@ -44,8 +44,6 @@ public class Util extends Portal{
 	private static final Log log = LogFactoryUtil.getLog(Util.class);
 	static String marca = "";
 	
-	
-	
 		//obteniendo subcategorias
 				public void getSubCategory(){
 					log.info("<---------- Metodo getCategory ---------->");
@@ -340,24 +338,7 @@ public class Util extends Portal{
 			  	
 			  
 			  	
-			  	public static boolean getIntervals(String i, String f, String date){
-					
-					boolean estado = false;
-					try {
-						String d = date.replace('/','-');
-						String init = i.replace('/','-');
-						String end = f.replace('/','-');
-						String fi = (end.equals(""))? DateTime.now().toString():end;
-						DateTime inicio = new DateTime(init);
-						DateTime fin = new DateTime(fi);
-						Interval interval = new Interval(inicio, fin);
-						estado = interval.contains(new DateTime(d));
-						} catch (IllegalArgumentException e) {
-						// TODO: handle exception
-							e.getStackTrace();
-						}
-					return estado;
-				}
+			  	
 			  
 }
 
