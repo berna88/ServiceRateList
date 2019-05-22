@@ -347,33 +347,33 @@ public class RateMapping extends Portal implements Mapping{
 										//log.info(getIntervals(Constants.CHECKINDATE, Constants.CHECKOUTDATE, document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()")));
 										if(getIntervals(Constants.CHECKINDATE, Constants.CHECKOUTDATE, document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"))){
 											mapping = new RateMapping(); 
-											mapping.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
-											mapping.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
-											mapping.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
-											mapping.setDescription(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
-											mapping.setShortDescription(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
-											mapping.setBenefits(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
-											mapping.setRestrictions(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
-											mapping.setCurrency(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
-											mapping.setEnddate(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
-											mapping.setGuid(journalArticle.getArticleId());
-											mapping.setLanguage(Constants.LENGUAJE);
+											mapping.code = document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()");
+											mapping.name = document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()");
+											mapping.keyword = document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()");
+											mapping.description = document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()");
+											mapping.shortDescription = document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()");
+											mapping.benefits = document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()");
+											mapping.restrictions = document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()");
+											mapping.currency = document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()");
+											mapping.enddate = document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()");
+											mapping.guid = journalArticle.getArticleId();
+											mapping.language = Constants.LENGUAJE;
 										}
 									}else{
 										log.info("No tienen filtros");
 										
 										mapping = new RateMapping(); 
-										mapping.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
-										mapping.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
-										mapping.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
-										mapping.setDescription(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
-										mapping.setShortDescription(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
-										mapping.setBenefits(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
-										mapping.setRestrictions(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
-										mapping.setCurrency(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
-										mapping.setEnddate(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
-										mapping.setGuid(journalArticle.getArticleId());
-										mapping.setLanguage(Constants.LENGUAJE);
+										mapping.code = document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()");
+										mapping.name = document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()");
+										mapping.keyword = document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()");
+										mapping.description = document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()");
+										mapping.shortDescription = document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()");
+										mapping.benefits = document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()");
+										mapping.restrictions = document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()");
+										mapping.currency = document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()");
+										mapping.enddate = document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()");
+										mapping.guid = journalArticle.getArticleId();
+										mapping.language = Constants.LENGUAJE;
 									}
 									
 									/*
@@ -438,18 +438,19 @@ public class RateMapping extends Portal implements Mapping{
 								Document document = null;
 								document = SAXReaderUtil.read(journalArticle.getContentByLocale(locale));
 								
+								 
 								mapping = new RateMapping(); 
-								mapping.setCode(document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()"));
-								mapping.setName(document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()"));
-								mapping.setKeyword(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
-								mapping.setDescription(document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()"));
-								mapping.setShortDescription(document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()"));
-								mapping.setBenefits(document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()"));
-								mapping.setRestrictions(document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()"));
-								mapping.setCurrency(document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()"));
-								mapping.setEnddate(document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
-								mapping.setGuid(journalArticle.getArticleId());
-								mapping.setLanguage(Constants.LENGUAJE);
+								mapping.code = document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()");
+								mapping.name = document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()");
+								mapping.keyword = document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()");
+								mapping.description = document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()");
+								mapping.shortDescription = document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()");
+								mapping.benefits = document.valueOf("//dynamic-element[@name='benefitsRate']/dynamic-content/text()");
+								mapping.restrictions = document.valueOf("//dynamic-element[@name='Restrictions1']/dynamic-content/text()");
+								mapping.currency = document.valueOf("//dynamic-element[@name='currencyRate']/dynamic-content/text()");
+								mapping.enddate = document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()");
+								mapping.guid = journalArticle.getArticleId();
+								mapping.language = Constants.LENGUAJE;
 								/*
 								List<Multimedia> multimedia = new ArrayList<>();
 								Multimedia multi = new Multimedia();

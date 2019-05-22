@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
+import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
 public class HotelMapping extends Portal implements Mapping{
@@ -589,8 +590,8 @@ public class HotelMapping extends Portal implements Mapping{
 	         xMLStreamWriter.writeEndElement();
 	     	
 	         
-		    /*xMLStreamWriter.writeStartElement("keyword");
-	        xMLStreamWriter.writeCharacters(getMetaTags().toString());
+		    xMLStreamWriter.writeStartElement("keyword");
+	        xMLStreamWriter.writeCharacters("");
 	        xMLStreamWriter.writeEndElement();
 	        xMLStreamWriter.writeStartElement("shortDescription");
 	        xMLStreamWriter.writeCharacters(shortDescription);
@@ -599,11 +600,11 @@ public class HotelMapping extends Portal implements Mapping{
 	        xMLStreamWriter.writeCharacters(description);
 	        xMLStreamWriter.writeEndElement();
 	        xMLStreamWriter.writeStartElement("order");
-	        xMLStreamWriter.writeCharacters("0");
+	        xMLStreamWriter.writeCharacters(Mapping.order);
 	        xMLStreamWriter.writeEndElement();
 	        xMLStreamWriter.writeStartElement("channel");
-	        xMLStreamWriter.writeCharacters("www");
-	        xMLStreamWriter.writeEndElement();*/
+	        xMLStreamWriter.writeCharacters(Mapping.channel);
+	        xMLStreamWriter.writeEndElement();
 			
 	        
 	        
@@ -803,10 +804,50 @@ public class HotelMapping extends Portal implements Mapping{
 	        try {
 				docXML = SAXReaderUtil.read(content.getContentByLocale(locale));
 				hotelMapping = new HotelMapping();
-				hotelMapping.setArticleId(content.getArticleId());
-				hotelMapping.setTitle(content.getTitle(locale));
-				hotelMapping.setHotelCode(docXML.valueOf("//dynamic-element[@name='codeHotel']/dynamic-content/text()"));
-				hotelMapping.setName(docXML.valueOf("//dynamic-element[@name='nameHotel']/dynamic-content/text()"));
+				hotelMapping.articleId = content.getArticleId();
+				hotelMapping.title =content.getTitle(locale);
+				hotelMapping.hotelCode= docXML.valueOf("//dynamic-element[@name='codeHotel']/dynamic-content/text()");
+				hotelMapping.name =docXML.valueOf("//dynamic-element[@name='nameHotel']/dynamic-content/text()");
+				hotelMapping.description=docXML.valueOf("//dynamic-element[@name='descriptionHotel']/dynamic-content/text()");
+				hotelMapping.shortDescription=docXML.valueOf("//dynamic-element[@name='shortDescriptionHotel']/dynamic-content/text()");
+				hotelMapping.bepDescription=docXML.valueOf("//dynamic-element[@name='BEPDescription']/dynamic-content/text()");
+				hotelMapping.corporateDescription=docXML.valueOf("//dynamic-element[@name='corpoRateDescription']/dynamic-content/text()");
+				hotelMapping.roomDescription=docXML.valueOf("//dynamic-element[@name='descriptionRoomsHotel']/dynamic-content/text()");
+				
+				List<Node> addressNodes = docXML.selectNodes("//dynamic-element[@name='addressHotel']/dynamic-element");
+				
+				for(Node addressNode : addressNodes){
+					String nombre= addressNode.valueOf("@name");
+					String valor= addressNode.valueOf("dynamic-content/text()");
+					if(nombre.equals("addressDetailHotel")){
+						hotelMapping.address=valor;
+					}
+					if(nombre.equals("countryHotel")){
+						hotelMapping.country=valor;
+					}
+					if(nombre.equals("stateHotel")){
+						hotelMapping.state=valor;
+					}
+					if(nombre.equals("cityHotel")){
+						hotelMapping.city=valor;
+					}
+					if(nombre.equals("zipHotel")){
+						hotelMapping.zipCode=valor;
+					}
+					if(nombre.equals("latitudHotel")){
+						hotelMapping.latitude=valor;
+					}
+					if(nombre.equals("longitudHotel")){
+						hotelMapping.longitude=valor;
+					}
+					if(nombre.equals("referencesHotel")){
+						hotelMapping.references=valor;
+					}
+					if(nombre.equals("directionsHotel")){
+						hotelMapping.addresses=valor;
+					}
+	            }
+				
 				//List<Node> roomLinkNodes = docXML.selectNodes("//dynamic-element[@name='roomLinksHotel']/dynamic-element");		
 				
 				/*JSONArray ArrayRoom = JSONFactoryUtil.createJSONArray();
