@@ -2,6 +2,7 @@ package com.consistent.rate.sax;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -23,6 +24,8 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
@@ -610,7 +613,7 @@ public class HotelMapping extends Portal implements Mapping{
 	        
 	      
 	      //telephone section
-	       /* xMLStreamWriter.writeStartElement("telephones");
+	       xMLStreamWriter.writeStartElement("telephones");
 	        for (String phone : getPhones()) {
 	        	if(!phone.equals("{}")){
 	            xMLStreamWriter.writeStartElement("telephone");
@@ -626,7 +629,7 @@ public class HotelMapping extends Portal implements Mapping{
 		        xMLStreamWriter.writeEndElement();
 	        	}
 			}
-	        xMLStreamWriter.writeEndElement();*/
+	        xMLStreamWriter.writeEndElement();
 	        //telephone section
 	          
 	        //location section
@@ -732,7 +735,7 @@ public class HotelMapping extends Portal implements Mapping{
 	         //destinations
 	       */
 		    //AlternativeHotels
-		    /*List<String> alternatives = getAlternativeHotels();
+		    List<String> alternatives = getAlternativeHotels();
 		    xMLStreamWriter.writeStartElement("alternatehotels");
 			List<String> cos=null;
 			for (String alternative : alternatives) {
@@ -747,9 +750,7 @@ public class HotelMapping extends Portal implements Mapping{
 							else{
 								aux=arregloString[x].replaceAll("					","");
 								cos.add(aux);
-							}
-							
-								
+							}		
 					}
 						
 					}
@@ -761,7 +762,7 @@ public class HotelMapping extends Portal implements Mapping{
 					xMLStreamWriter.writeCharacters(alter);
 					xMLStreamWriter.writeEndElement();	
 				}	
-			}*/
+			}
 		    xMLStreamWriter.writeEndElement();	
 			//AlternativeHotels	
 			//Root 
@@ -802,6 +803,7 @@ public class HotelMapping extends Portal implements Mapping{
 		HotelMapping hotelMapping = new HotelMapping();
 		Document docXML=null;
 	        try {
+	        	
 				docXML = SAXReaderUtil.read(content.getContentByLocale(locale));
 				hotelMapping = new HotelMapping();
 				hotelMapping.articleId = content.getArticleId();
@@ -848,6 +850,43 @@ public class HotelMapping extends Portal implements Mapping{
 					}
 	            }
 				
+				List<Node> telefonoNodes = docXML.selectNodes("//dynamic-element[@name='telephoneHotel']/dynamic-element");		
+				List<String> telefonosArray=new ArrayList<String>();
+				for(Node telefonoNode : telefonoNodes){				
+					String valor= telefonoNode.valueOf("dynamic-content/text()");
+					if(!valor.trim().equals("")){					
+						telefonosArray.add(valor);
+					}			
+	            }
+				
+				hotelMapping.phones=sanitizeArray(telefonosArray);
+				List<Node> alternativeHotels = docXML.selectNodes("//dynamic-element[@name='hotelesAlternos']/dynamic-element");		
+				List<String> alternativeHotelsArray=new ArrayList<String>();
+				for(Node alternativeHotel : alternativeHotels){				
+					String valor= alternativeHotel.valueOf("dynamic-content");
+					if(!valor.trim().equals("") && !valor.trim().equals("{}")){
+						alternativeHotelsArray.add(valor);
+					}
+								
+	            }
+				
+				hotelMapping.alternativeHotels=sanitizeArray(alternativeHotelsArray);
+				/*
+				this.floors=docXML.valueOf("//dynamic-element[@name='floorsHotels']/dynamic-content/text()");
+				this.rooms=docXML.valueOf("//dynamic-element[@name='roomsHotels']/dynamic-content/text()");
+				this.elevators=docXML.valueOf("//dynamic-element[@name='elevatorsHotels']/dynamic-content/text()");
+				this.restaurants=docXML.valueOf("//dynamic-element[@name='restaurantsHotels']/dynamic-content/text()");
+				this.bars=docXML.valueOf("//dynamic-element[@name='barsHotels']/dynamic-content/text()");
+				this.swimmingPools=docXML.valueOf("//dynamic-element[@name='poolsHotels']/dynamic-content/text()");
+				this.stars=docXML.valueOf("//dynamic-element[@name='starRatingHotel']/dynamic-content/text()");
+				this.openingTime=docXML.valueOf("//dynamic-element[@name='openingDateHotels']/dynamic-content/text()");
+				this.closingTime=docXML.valueOf("//dynamic-element[@name='closingDateHotels']/dynamic-content/text()");
+				this.announcements=docXML.valueOf("//dynamic-element[@name='avisosHotels']/dynamic-content/text()");
+				this.announcementStartingTime=docXML.valueOf("//dynamic-element[@name='fechaInicioAvisoHotels']/dynamic-content/text()");
+				this.announcementFinishingTime=docXML.valueOf("//dynamic-element[@name='fechaFinAvisoHotels']/dynamic-content/text()");
+				this.checkIn=docXML.valueOf("//dynamic-element[@name='horaCheckinHotels']/dynamic-content/text()");
+				this.checkOut=docXML.valueOf("//dynamic-element[@name='horaCheckoutHotels']/dynamic-content/text()");*/
+				
 				//List<Node> roomLinkNodes = docXML.selectNodes("//dynamic-element[@name='roomLinksHotel']/dynamic-element");		
 				
 				/*JSONArray ArrayRoom = JSONFactoryUtil.createJSONArray();
@@ -878,6 +917,16 @@ public class HotelMapping extends Portal implements Mapping{
 	        return hotelMapping.getMapping();
 	        
 	}
+	
+	 private List<String> sanitizeArray(List<String> arraySan){
+	    	if(arraySan.size()>0){
+		    	while(arraySan.size()<2){
+					JSONObject object=JSONFactoryUtil.createJSONObject();
+					arraySan.add(object.toJSONString());				
+				}
+	    	}
+	    	return arraySan;    	
+	    }
 	/*private String getJournalArticleByClassPk(Long classPk,String laguage,Long siteID){
 		 DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(com.liferay.journal.model.impl.JournalArticleImpl.class, "journal",PortalClassLoaderUtil.getClassLoader());			
 		 dynamicQuery.add((PropertyFactoryUtil.forName("resourcePrimKey").eq(classPk)));
