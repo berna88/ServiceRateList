@@ -1,8 +1,8 @@
 package com.consistent.rate.sax;
 
 import com.consistent.rate.constants.Constants;
-import com.consistent.rate.models.Rate;
-import com.consistent.rate.singleton.Portal;
+import com.consistent.rate.interfaces.Mapping;
+import com.consistent.rate.portal.Portal;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
@@ -433,8 +433,7 @@ public class RateMapping extends Portal implements Mapping{
 							if(journalArticle.getContent().contains(codesSplit[i]))
 							   {
 								//article.add(journalArticle);
-								final Rate rate = new Rate();
-								rate.setTitle(journalArticle.getTitle(locale));
+								
 								Document document = null;
 								document = SAXReaderUtil.read(journalArticle.getContentByLocale(locale));
 								

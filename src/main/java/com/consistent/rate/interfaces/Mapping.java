@@ -1,4 +1,4 @@
-package com.consistent.rate.sax;
+package com.consistent.rate.interfaces;
 
 import java.io.IOException;
 

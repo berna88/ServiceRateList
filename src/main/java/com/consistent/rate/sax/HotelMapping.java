@@ -11,7 +11,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import com.consistent.rate.constants.Constants;
-import com.consistent.rate.singleton.Portal;
+import com.consistent.rate.interfaces.Mapping;
+import com.consistent.rate.portal.Portal;
 import com.liferay.dynamic.data.mapping.exception.NoSuchStructureException;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
@@ -900,7 +901,7 @@ public class HotelMapping extends Portal implements Mapping{
 		 	
 			for (JournalArticleImpl journalArticleImpl : ja) {
 					if(JournalArticleLocalServiceUtil.isLatestVersion(Constants.SITE_ID, journalArticleImpl.getArticleId(), journalArticleImpl.getVersion(),WorkflowConstants.STATUS_APPROVED) && !journalArticleImpl.isInTrash()){
-						com.consistent.rate.mapping.RoomMapping content = new com.consistent.rate.mapping.RoomMapping();
+						com.consistent.rate.sax.RoomMapping content = new com.consistent.rate.sax.RoomMapping();
 						content.RoomContent(journalArticleImpl,Constants.getLanguaje());
 						result = content.mappngRoom();
 							

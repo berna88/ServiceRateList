@@ -1,4 +1,4 @@
-package com.consistent.rate.configuration;
+package com.consistent.rate.interfaces;
 
 
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;

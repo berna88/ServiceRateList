@@ -1,4 +1,4 @@
-package com.consistent.rate.mapping;
+package com.consistent.rate.service;
 
 import java.io.IOException;
 
@@ -10,7 +10,8 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.stream.XMLStreamException;
 
 import com.consistent.rate.constants.Constants;
-import com.consistent.rate.singleton.Portal;
+import com.consistent.rate.interfaces.SAX;
+import com.consistent.rate.portal.Portal;
 import com.consistent.rate.util.Util;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -20,11 +21,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 public class ServicesRest extends Portal{
 	
 	private static final Log log = LogFactoryUtil.getLog(ServicesRest.class);
-
-	GetMappingRate _rates= new GetMappingRate();
     
-	com.consistent.rate.util.Util _util_rate=  new Util();
-	
+	final SAX sax = new Util();
 	
 	@GET
 	@Path("/getHotelRoomRates")
@@ -51,7 +49,7 @@ public class ServicesRest extends Portal{
 		//Estableciendo canal
 		Constants.CHANNEL = channel;
 		
-		String xml = _rates.getXML();
+		String xml = sax.getXML();
 		log.info("<-------- Proceso finalizado getHotelRoomRates--------->");
 		return xml;
 	}
@@ -70,12 +68,8 @@ public class ServicesRest extends Portal{
 			@QueryParam("checkoutdate") String checkoutdate,
 			@QueryParam("contractcodes") String contractcodes) throws PortalException, IOException, XMLStreamException {
 		log.info("<-------- Metodo getRateList Optimizado --------->");	
-		
-		
 		// Estableciendo el siteId del sitio
 		Constants.SITE_ID = Long.parseLong(siteID);
-		//Id de Hotel
-		log.info("Identificador del hotel: "+getFolderId("Hotel"));
 		// Estableciendo la marca
 		Constants.CODIGODEMARCA = brandcode;
 		// Estableciendo el lenguaje
@@ -91,7 +85,7 @@ public class ServicesRest extends Portal{
 		Constants.CHECKINDATE = checkindate;
 		Constants.CHECKOUTDATE = checkoutdate;
 		
-		String xml = _rates.getXML();
+		String xml = sax.getXML();
 		log.info("<-------- Proceso finalizado --------->");
 		return xml;
 	}

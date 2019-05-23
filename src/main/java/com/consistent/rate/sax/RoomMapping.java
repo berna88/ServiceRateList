@@ -1,4 +1,4 @@
-package com.consistent.rate.mapping;
+package com.consistent.rate.sax;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -9,8 +9,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import com.consistent.rate.constants.Constants;
-import com.consistent.rate.models.hotel.Multimedia;
-import com.consistent.rate.sax.Mapping;
+import com.consistent.rate.interfaces.Mapping;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;

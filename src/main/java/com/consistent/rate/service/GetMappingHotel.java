@@ -1,11 +1,11 @@
-package com.consistent.rate.mapping;
+package com.consistent.rate.service;
 
  
-import java.util.ArrayList;
-import java.util.List;
+/*import java.util.ArrayList;
+import java.util.List;*/
 
 import javax.xml.bind.annotation.XmlRootElement;
-
+/*
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Node;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;*/
 
  
 @XmlRootElement // Permite parsear nuestra entidad a XML o JSON según el Accept de la petición
@@ -32,9 +32,9 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
  *
  */
 public class GetMappingHotel {
-	
+	/*
 	private static final Log log = LogFactoryUtil.getLog(GetMappingHotel.class);  
-    /*Converter maping with SAX*/
+    Converter maping with SAX
     public GetMappingHotel() {
     }
     
@@ -1039,5 +1039,5 @@ public class GetMappingHotel {
     private List<String> metaState;
     private List<String> metaTags;
 	
- 
+ */
 }

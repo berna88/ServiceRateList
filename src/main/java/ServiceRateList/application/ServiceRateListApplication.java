@@ -5,7 +5,8 @@ import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 import org.osgi.service.component.annotations.Component;
-import com.consistent.rate.mapping.ServicesRest;
+
+import com.consistent.rate.service.ServicesRest;
 
 /**
  * @author liferay

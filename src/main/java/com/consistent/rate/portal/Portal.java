@@ -1,4 +1,4 @@
-package com.consistent.rate.singleton;
+package com.consistent.rate.portal;
 
 import java.util.List;
 

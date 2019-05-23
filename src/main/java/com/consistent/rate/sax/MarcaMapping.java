@@ -8,6 +8,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import com.consistent.rate.interfaces.Mapping;
 import com.liferay.portal.kernel.exception.PortalException;
 
 
