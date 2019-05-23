@@ -342,13 +342,14 @@ public class RateMapping extends Portal implements Mapping{
 								
 								document = SAXReaderUtil.read(journalArticle.getContentByLocale(locale));
 									
-									if(!Constants.CHECKINDATE.isEmpty() && !Constants.CHECKOUTDATE.isEmpty()){
+									if(!Constants.CHECKINDATE.isEmpty()){
 										//log.info("fecha: "+document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
 										//log.info(getIntervals(Constants.CHECKINDATE, Constants.CHECKOUTDATE, document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()")));
 										if(getIntervals(Constants.CHECKINDATE, Constants.CHECKOUTDATE, document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"))){
 											mapping = new RateMapping(); 
 											mapping.code = document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()");
 											mapping.name = document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()");
+											mapping.title = document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()").concat("-").concat(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
 											mapping.keyword = document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()");
 											mapping.description = document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()");
 											mapping.shortDescription = document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()");
@@ -360,11 +361,10 @@ public class RateMapping extends Portal implements Mapping{
 											mapping.language = Constants.LENGUAJE;
 										}
 									}else{
-										log.info("No tienen filtros");
-										
 										mapping = new RateMapping(); 
 										mapping.code = document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()");
 										mapping.name = document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()");
+										mapping.title = document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()").concat("-").concat(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
 										mapping.keyword = document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()");
 										mapping.description = document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()");
 										mapping.shortDescription = document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()");
@@ -442,6 +442,7 @@ public class RateMapping extends Portal implements Mapping{
 								mapping = new RateMapping(); 
 								mapping.code = document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()");
 								mapping.name = document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()");
+								mapping.title = document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()").concat("-").concat(document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()"));
 								mapping.keyword = document.valueOf("//dynamic-element[@name='keywordRate']/dynamic-content/text()");
 								mapping.description = document.valueOf("//dynamic-element[@name='descriptionLongRate']/dynamic-content/text()");
 								mapping.shortDescription = document.valueOf("//dynamic-element[@name='shortDescriptionRate']/dynamic-content/text()");

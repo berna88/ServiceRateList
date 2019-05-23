@@ -10,13 +10,14 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.stream.XMLStreamException;
 
 import com.consistent.rate.constants.Constants;
+import com.consistent.rate.singleton.Portal;
 import com.consistent.rate.util.Util;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 @Path("/services/posadas")
-public class ServicesRest {
+public class ServicesRest extends Portal{
 	
 	private static final Log log = LogFactoryUtil.getLog(ServicesRest.class);
 
@@ -68,9 +69,13 @@ public class ServicesRest {
 			@QueryParam("checkindate") String checkindate,
 			@QueryParam("checkoutdate") String checkoutdate,
 			@QueryParam("contractcodes") String contractcodes) throws PortalException, IOException, XMLStreamException {
-		log.info("<-------- Metodo getRateList Optimizado --------->");		
+		log.info("<-------- Metodo getRateList Optimizado --------->");	
+		
+		
 		// Estableciendo el siteId del sitio
 		Constants.SITE_ID = Long.parseLong(siteID);
+		//Id de Hotel
+		log.info("Identificador del hotel: "+getFolderId("Hotel"));
 		// Estableciendo la marca
 		Constants.CODIGODEMARCA = brandcode;
 		// Estableciendo el lenguaje

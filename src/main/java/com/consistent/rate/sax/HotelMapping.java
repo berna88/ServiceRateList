@@ -23,7 +23,10 @@ import com.liferay.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
@@ -44,6 +47,7 @@ public class HotelMapping extends Portal implements Mapping{
     private String hotelCode;
     private String travelClickCode;
     private String name;
+    private String keyword;
     private String description;
     private String shortDescription;
     private String bepDescription;
@@ -102,6 +106,13 @@ public class HotelMapping extends Portal implements Mapping{
 
 	public void setArticleId(String articleId) {
 		this.articleId = articleId;
+	}
+	public String getKeyword(){
+		return keyword;
+	}
+	
+	public void setKeyword(String keyword){
+		this.keyword = keyword;
 	}
 
 	public String getTitle() {
@@ -558,13 +569,14 @@ public class HotelMapping extends Portal implements Mapping{
 				log.error("Causa: " + e.getCause());
 			}catch (NullPointerException e) {
 				log.error("El nombre de la Marca");
+				log.error("Corregir el nombre de la marca");
 				log.error("Causa: " + e.getCause());
 			}
 			return hotels;
 		}
 
 	@Override
-	public String getMapping() throws XMLStreamException, IOException {
+	public String getMapping() throws XMLStreamException, IOException, NumberFormatException, PortalException {
 
 		 StringWriter stringWriter = new StringWriter();
 		 XMLOutputFactory xMLOutputFactory = XMLOutputFactory.newInstance();
@@ -573,198 +585,149 @@ public class HotelMapping extends Portal implements Mapping{
        xMLOutputFactory.createXMLStreamWriter(stringWriter);
        	 xMLStreamWriter.writeStartDocument();
 	         xMLStreamWriter.writeStartElement("hotel");	
-	         xMLStreamWriter.writeStartElement("brandcode");
-	         xMLStreamWriter.writeCharacters(Constants.CODIGODEMARCA); 
-	         xMLStreamWriter.writeEndElement();
-	         xMLStreamWriter.writeStartElement("guid");
-	         xMLStreamWriter.writeCharacters(articleId); 
-	         xMLStreamWriter.writeEndElement();
-	         xMLStreamWriter.writeStartElement("code");
-	         xMLStreamWriter.writeCharacters(hotelCode);
-	         xMLStreamWriter.writeEndElement();
-	         xMLStreamWriter.writeStartElement("name");
-	         xMLStreamWriter.writeCharacters(name);
-	         xMLStreamWriter.writeEndElement();
-	         xMLStreamWriter.writeStartElement("title");
-	         xMLStreamWriter.writeCharacters(title);
-	         xMLStreamWriter.writeEndElement();
-	         xMLStreamWriter.writeStartElement("language");
-	         xMLStreamWriter.writeCharacters(Constants.LENGUAJE);
-	         xMLStreamWriter.writeEndElement();
-	     	
-	         
-		    xMLStreamWriter.writeStartElement("keyword");
-	        xMLStreamWriter.writeCharacters("");
-	        xMLStreamWriter.writeEndElement();
-	        xMLStreamWriter.writeStartElement("shortDescription");
-	        xMLStreamWriter.writeCharacters(shortDescription);
-	        xMLStreamWriter.writeEndElement();
-	        xMLStreamWriter.writeStartElement("description");
-	        xMLStreamWriter.writeCharacters(description);
-	        xMLStreamWriter.writeEndElement();
-	        xMLStreamWriter.writeStartElement("order");
-	        xMLStreamWriter.writeCharacters(Mapping.order);
-	        xMLStreamWriter.writeEndElement();
-	        xMLStreamWriter.writeStartElement("channel");
-	        xMLStreamWriter.writeCharacters(Mapping.channel);
-	        xMLStreamWriter.writeEndElement();
-			
-	        
-	        
-	      
-	      //telephone section
-	       xMLStreamWriter.writeStartElement("telephones");
-	        for (String phone : getPhones()) {
-	        	if(!phone.equals("{}")){
-	            xMLStreamWriter.writeStartElement("telephone");
-	  	       
-	            xMLStreamWriter.writeStartElement("number");
-	  	        xMLStreamWriter.writeCharacters(phone);
-	  	        xMLStreamWriter.writeEndElement();
-	  	        
-	  	        xMLStreamWriter.writeStartElement("type");
-		        xMLStreamWriter.writeCharacters("telephone");
+		         xMLStreamWriter.writeStartElement("guid");
+		         	xMLStreamWriter.writeCharacters(articleId); 
+		         xMLStreamWriter.writeEndElement();
+		         xMLStreamWriter.writeStartElement("code");
+		         	xMLStreamWriter.writeCharacters(hotelCode);
+		         xMLStreamWriter.writeEndElement();
+		         xMLStreamWriter.writeStartElement("name");
+		         	xMLStreamWriter.writeCharacters(name);
+		         xMLStreamWriter.writeEndElement();
+		         xMLStreamWriter.writeStartElement("title");
+		         	xMLStreamWriter.writeCharacters(title);
+		         xMLStreamWriter.writeEndElement();
+		         xMLStreamWriter.writeStartElement("language");
+		         	xMLStreamWriter.writeCharacters(Constants.LENGUAJE);
+		         xMLStreamWriter.writeEndElement();
+			    xMLStreamWriter.writeStartElement("keyword");
+		        	xMLStreamWriter.writeCharacters(keyword);
+		        xMLStreamWriter.writeEndElement();
+		        xMLStreamWriter.writeStartElement("shortDescription");
+		        	xMLStreamWriter.writeCharacters(shortDescription);
+		        xMLStreamWriter.writeEndElement();
+		        xMLStreamWriter.writeStartElement("description");
+		        	xMLStreamWriter.writeCharacters(description);
+		        xMLStreamWriter.writeEndElement();
+		        xMLStreamWriter.writeStartElement("order");
+		        	xMLStreamWriter.writeCharacters(Mapping.order);
+		        xMLStreamWriter.writeEndElement();
+		        xMLStreamWriter.writeStartElement("channel");
+		        	xMLStreamWriter.writeCharacters(Mapping.channel);
 		        xMLStreamWriter.writeEndElement();
 		        
-		        xMLStreamWriter.writeEndElement();
-	        	}
-			}
-	        xMLStreamWriter.writeEndElement();
-	        //telephone section
-	          
-	        //location section
-	         xMLStreamWriter.writeStartElement("location");
-		         xMLStreamWriter.writeStartElement("address");
-		         xMLStreamWriter.writeCharacters(address);
-		         xMLStreamWriter.writeEndElement();
-		         xMLStreamWriter.writeStartElement("city");
-		         xMLStreamWriter.writeCharacters(city);
-		         xMLStreamWriter.writeEndElement();
-		         xMLStreamWriter.writeStartElement("country");
-		         xMLStreamWriter.writeCharacters(country);
-		         xMLStreamWriter.writeEndElement();
-		         xMLStreamWriter.writeStartElement("directions");
-		         xMLStreamWriter.writeCharacters(getAddresses());
-		         xMLStreamWriter.writeEndElement();
-		         xMLStreamWriter.writeStartElement("latitude");
-		         xMLStreamWriter.writeCharacters(latitude);
-		         xMLStreamWriter.writeEndElement();
-		         xMLStreamWriter.writeStartElement("longitude");
-		         xMLStreamWriter.writeCharacters(longitude);
-		         xMLStreamWriter.writeEndElement();
-		         xMLStreamWriter.writeStartElement("references");
-		         xMLStreamWriter.writeCharacters(references);
-		         xMLStreamWriter.writeEndElement();
-		         xMLStreamWriter.writeStartElement("state");
-		         xMLStreamWriter.writeCharacters(state);
-		         xMLStreamWriter.writeEndElement();
-		         xMLStreamWriter.writeStartElement("zip");
-		         xMLStreamWriter.writeCharacters(zipCode);
-		         xMLStreamWriter.writeEndElement();
-	         xMLStreamWriter.writeEndElement();
-	         //location section
-	         
-	         /*mediaLink section*/
-	         /*JSONArray ArrayMediaLinks = JSONFactoryUtil.createJSONArray();
-	         List<String> MeliaLinkList = getMediaLinks();
-				for (String mediaLinkItem : MeliaLinkList) {
-					JSONObject myObject;
-					try {
-						myObject = JSONFactoryUtil.createJSONObject(mediaLinkItem);
-						ArrayMediaLinks.put(myObject);
-					} catch (JSONException e) {
-					//	log.error("Error converter json"+e);
-					}
-					
-				}
-	         xMLStreamWriter.writeStartElement("medialinks");		   
-		         xMLStreamWriter.writeStartElement("medialink");
-		         
-				   xMLStreamWriter.writeStartElement("keyword");
-				   xMLStreamWriter.writeEndElement();
-				         for (int i = 0; i < ArrayMediaLinks.length(); i++) {
-								JSONObject jsonobject = ArrayMediaLinks.getJSONObject(i);
-							    String link = jsonobject.getString("link");
-							    String type_image = jsonobject.getString("type_image");
-								xMLStreamWriter.writeStartElement("multimedia");
-					            xMLStreamWriter.writeAttribute("type",type_image);
-						        xMLStreamWriter.writeStartElement("url");
-						        xMLStreamWriter.writeCharacters(link);
-						        xMLStreamWriter.writeEndElement();
-					            xMLStreamWriter.writeEndElement();
-							}
-				         xMLStreamWriter.writeStartElement("thumbnail");
-				         xMLStreamWriter.writeEndElement();
-				         xMLStreamWriter.writeStartElement("type");
-				         xMLStreamWriter.writeEndElement();
-			      xMLStreamWriter.writeEndElement();
-	         xMLStreamWriter.writeEndElement();*/
-	          //mediaLink section
-	         
-	         /*destinations
-	         JSONArray ArrayDestinations = JSONFactoryUtil.createJSONArray();
-				List<String> Destinations = content.getDestinationLinks();
-				for (String destination : Destinations) {
-					if(!destination.equals("{}")){
+		        /*mediaLink section*/
+		         JSONArray ArrayMediaLinks = JSONFactoryUtil.createJSONArray();
+		         List<String> MeliaLinkList = getMediaLinks();
+					for (String mediaLinkItem : MeliaLinkList) {
 						JSONObject myObject;
 						try {
-							myObject = JSONFactoryUtil.createJSONObject(destination);
-							ArrayDestinations.put(myObject);
-						}catch (JSONException e) {
-							//log.error("Error converter json"+e);
+							myObject = JSONFactoryUtil.createJSONObject(mediaLinkItem);
+							ArrayMediaLinks.put(myObject);
+						} catch (JSONException e) {
+						//	log.error("Error converter json"+e);
 						}
 						
 					}
-				
-				}
-			List<String> codes=new ArrayList<>();
-		    for (int i = 0; i < ArrayDestinations.length(); i++) {
-					JSONObject jsonobject = ArrayDestinations.getJSONObject(i);
-				    Long pk = jsonobject.getLong("classPK");
-				    codes.add(getJournalArticleByClassPk(pk,laguage,siteID));
-			}
-	         
-	         xMLStreamWriter.writeStartElement("destinations");
-	        for (int i = 0; i < codes.size(); i++) {
-					xMLStreamWriter.writeStartElement("destination");
-				    xMLStreamWriter.writeAttribute("code",codes.get(i));
-				    xMLStreamWriter.writeAttribute("guid","");
-				    xMLStreamWriter.writeEndElement();
-				}
-		    xMLStreamWriter.writeEndElement();
-	         //destinations
-	       */
-		    //AlternativeHotels
-		    List<String> alternatives = getAlternativeHotels();
-		    xMLStreamWriter.writeStartElement("alternatehotels");
-			List<String> cos=null;
-			for (String alternative : alternatives) {
-				if(!alternative.equals("{}")){
-					cos = new ArrayList<>();
-					String sinSaltosDeLinea = alternative.replaceAll(" ","");
-					String[] arregloString = sinSaltosDeLinea.split("\n"); 
-					for(int x=0; x < arregloString.length;x++){ 
-						String aux="";
-						if(arregloString[x].length() > 0){
-							if(x == arregloString.length -1){}
-							else{
-								aux=arregloString[x].replaceAll("					","");
-								cos.add(aux);
-							}		
+		         xMLStreamWriter.writeStartElement("medialinks");		   
+			         xMLStreamWriter.writeStartElement("medialink");
+			         
+					   xMLStreamWriter.writeStartElement("keyword");
+					   xMLStreamWriter.writeEndElement();
+					         for (int i = 0; i < ArrayMediaLinks.length(); i++) {
+									JSONObject jsonobject = ArrayMediaLinks.getJSONObject(i);
+								    String link = jsonobject.getString("link");
+								    String type_image = jsonobject.getString("type_image");
+									xMLStreamWriter.writeStartElement("multimedia");
+						            xMLStreamWriter.writeAttribute("type",type_image);
+							        xMLStreamWriter.writeStartElement("url");
+							        xMLStreamWriter.writeCharacters(link);
+							        xMLStreamWriter.writeEndElement();
+						            xMLStreamWriter.writeEndElement();
+								}
+					         xMLStreamWriter.writeStartElement("thumbnail");
+					         xMLStreamWriter.writeEndElement();
+					         xMLStreamWriter.writeStartElement("type");
+					         xMLStreamWriter.writeEndElement();
+				      xMLStreamWriter.writeEndElement();
+		         xMLStreamWriter.writeEndElement();
+		          //mediaLink section
+		         
+		       //location section
+		         xMLStreamWriter.writeStartElement("location");
+			         xMLStreamWriter.writeStartElement("address");
+			         xMLStreamWriter.writeCharacters(address);
+			         xMLStreamWriter.writeEndElement();
+			         xMLStreamWriter.writeStartElement("city");
+			         xMLStreamWriter.writeCharacters(city);
+			         xMLStreamWriter.writeEndElement();
+			         xMLStreamWriter.writeStartElement("country");
+			         xMLStreamWriter.writeCharacters(country);
+			         xMLStreamWriter.writeEndElement();
+			         xMLStreamWriter.writeStartElement("directions");
+			         xMLStreamWriter.writeCharacters(getAddresses());
+			         xMLStreamWriter.writeEndElement();
+			         xMLStreamWriter.writeStartElement("latitude");
+			         xMLStreamWriter.writeCharacters(latitude);
+			         xMLStreamWriter.writeEndElement();
+			         xMLStreamWriter.writeStartElement("longitude");
+			         xMLStreamWriter.writeCharacters(longitude);
+			         xMLStreamWriter.writeEndElement();
+			         xMLStreamWriter.writeStartElement("references");
+			         xMLStreamWriter.writeCharacters(references);
+			         xMLStreamWriter.writeEndElement();
+			         xMLStreamWriter.writeStartElement("state");
+			         xMLStreamWriter.writeCharacters(state);
+			         xMLStreamWriter.writeEndElement();
+			         xMLStreamWriter.writeStartElement("zip");
+			         xMLStreamWriter.writeCharacters(zipCode);
+			         xMLStreamWriter.writeEndElement();
+		         xMLStreamWriter.writeEndElement();
+		         //location section
+		         
+			      //telephone section
+			       xMLStreamWriter.writeStartElement("telephones");
+			        for (String phone : getPhones()) {
+			        	if(!phone.equals("{}")){
+			            xMLStreamWriter.writeStartElement("telephone");
+			  	       
+			            xMLStreamWriter.writeStartElement("number");
+			  	        xMLStreamWriter.writeCharacters(phone);
+			  	        xMLStreamWriter.writeEndElement();
+			  	        
+			  	        xMLStreamWriter.writeStartElement("type");
+				        xMLStreamWriter.writeCharacters("telephone");
+				        xMLStreamWriter.writeEndElement();
+				        
+				        xMLStreamWriter.writeEndElement();
+			        	}
 					}
-						
+			        xMLStreamWriter.writeEndElement();
+			        //telephone section
+			        //rooms
+					
+					JSONArray ArrayRoom = JSONFactoryUtil.createJSONArray();
+					xMLStreamWriter.writeStartElement("rooms");
+					for(String roomLink : getRoomLinks()){				
+							JSONObject object=null;
+								try {
+									object=JSONFactoryUtil.createJSONObject(roomLink);
+									String classpk=object.getString("classPK");
+									xMLStreamWriter.writeDTD(getJournalArticleByClassPk(Long.parseLong(classpk)));
+									ArrayRoom.put(object);		
+								} catch (JSONException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+												
 					}
-				}
-				}
-			if(cos!=null){
-				for (String alter : cos) {
-					xMLStreamWriter.writeStartElement("hotelcode");
-					xMLStreamWriter.writeCharacters(alter);
-					xMLStreamWriter.writeEndElement();	
-				}	
-			}
-		    xMLStreamWriter.writeEndElement();	
-			//AlternativeHotels	
+					xMLStreamWriter.writeEndElement();
+										
+		            
+			       
+			        
+			        
+			        //fin rooms
 			//Root 
 	         xMLStreamWriter.writeEndDocument();
 	           
@@ -798,7 +761,7 @@ public class HotelMapping extends Portal implements Mapping{
 		this.name = "";
 	}
 	
-	private String HotelContentsMapping(JournalArticle content, String locale) throws XMLStreamException, IOException{
+	private String HotelContentsMapping(JournalArticle content, String locale) throws XMLStreamException, IOException, NumberFormatException, PortalException{
 		
 		HotelMapping hotelMapping = new HotelMapping();
 		Document docXML=null;
@@ -808,6 +771,7 @@ public class HotelMapping extends Portal implements Mapping{
 				hotelMapping = new HotelMapping();
 				hotelMapping.articleId = content.getArticleId();
 				hotelMapping.title =content.getTitle(locale);
+				hotelMapping.keyword = docXML.valueOf("//dynamic-element[@name='keywordsHotel']/dynamic-content/text()");
 				hotelMapping.hotelCode= docXML.valueOf("//dynamic-element[@name='codeHotel']/dynamic-content/text()");
 				hotelMapping.name =docXML.valueOf("//dynamic-element[@name='nameHotel']/dynamic-content/text()");
 				hotelMapping.description=docXML.valueOf("//dynamic-element[@name='descriptionHotel']/dynamic-content/text()");
@@ -860,6 +824,7 @@ public class HotelMapping extends Portal implements Mapping{
 	            }
 				
 				hotelMapping.phones=sanitizeArray(telefonosArray);
+			
 				List<Node> alternativeHotels = docXML.selectNodes("//dynamic-element[@name='hotelesAlternos']/dynamic-element");		
 				List<String> alternativeHotelsArray=new ArrayList<String>();
 				for(Node alternativeHotel : alternativeHotels){				
@@ -870,46 +835,43 @@ public class HotelMapping extends Portal implements Mapping{
 								
 	            }
 				
-				hotelMapping.alternativeHotels=sanitizeArray(alternativeHotelsArray);
-				/*
-				this.floors=docXML.valueOf("//dynamic-element[@name='floorsHotels']/dynamic-content/text()");
-				this.rooms=docXML.valueOf("//dynamic-element[@name='roomsHotels']/dynamic-content/text()");
-				this.elevators=docXML.valueOf("//dynamic-element[@name='elevatorsHotels']/dynamic-content/text()");
-				this.restaurants=docXML.valueOf("//dynamic-element[@name='restaurantsHotels']/dynamic-content/text()");
-				this.bars=docXML.valueOf("//dynamic-element[@name='barsHotels']/dynamic-content/text()");
-				this.swimmingPools=docXML.valueOf("//dynamic-element[@name='poolsHotels']/dynamic-content/text()");
-				this.stars=docXML.valueOf("//dynamic-element[@name='starRatingHotel']/dynamic-content/text()");
-				this.openingTime=docXML.valueOf("//dynamic-element[@name='openingDateHotels']/dynamic-content/text()");
-				this.closingTime=docXML.valueOf("//dynamic-element[@name='closingDateHotels']/dynamic-content/text()");
-				this.announcements=docXML.valueOf("//dynamic-element[@name='avisosHotels']/dynamic-content/text()");
-				this.announcementStartingTime=docXML.valueOf("//dynamic-element[@name='fechaInicioAvisoHotels']/dynamic-content/text()");
-				this.announcementFinishingTime=docXML.valueOf("//dynamic-element[@name='fechaFinAvisoHotels']/dynamic-content/text()");
-				this.checkIn=docXML.valueOf("//dynamic-element[@name='horaCheckinHotels']/dynamic-content/text()");
-				this.checkOut=docXML.valueOf("//dynamic-element[@name='horaCheckoutHotels']/dynamic-content/text()");*/
+				List<Node> mediaNodes = docXML.selectNodes("//dynamic-element[@name='mediaLinksHotel']/dynamic-element");
+				List<String> mediaArray=new ArrayList<String>();
+				for(Node mediaNode : mediaNodes){				
+					String pie= mediaNode.valueOf("dynamic-element[@name='Pie']/dynamic-content/text()");				
+					String link= mediaNode.valueOf("dynamic-content/text()");				
+					String type_image= mediaNode.valueOf("dynamic-element[@name='typeHotel']/dynamic-content/text()");						
+					if(!link.trim().equals("")){
+						JSONObject object=JSONFactoryUtil.createJSONObject();
+						object.put("link", link);
+						object.put("pie", pie);
+						object.put("type_image", type_image);
+						mediaArray.add(object.toJSONString());
+					}
+					}
 				
-				//List<Node> roomLinkNodes = docXML.selectNodes("//dynamic-element[@name='roomLinksHotel']/dynamic-element");		
+				hotelMapping.mediaLinks=sanitizeArray(mediaArray);
 				
-				/*JSONArray ArrayRoom = JSONFactoryUtil.createJSONArray();
+				
+				
+				List<Node> roomLinkNodes = docXML.selectNodes("//dynamic-element[@name='roomLinksHotel']/dynamic-element");		
+				List<String> roomsArray=new ArrayList<String>();
 				for(Node roomLinkNode : roomLinkNodes){				
 					String valor= roomLinkNode.valueOf("dynamic-content/text()");
 					if(!valor.trim().equals("")){
 						JSONObject object=null;
 						try {
 							object=JSONFactoryUtil.createJSONObject(valor);
-							String classpk=object.getString("classPk");
-							if(com.liferay.portal.kernel.util.Validator.isNotNull(classpk)){
-								
-								
-								
-							}
-							
-							
+							getJournalArticleByClassPk(Long.parseLong(object.get("classPK").toString()));
 						} catch (JSONException e) {
 							log.error("ERROR AL OBTENER JSON",e);
 						}					
-						ArrayRoom.put(object);
-						}			
-	            }*/
+						roomsArray.add(object.toJSONString());
+					}
+				}
+				
+				hotelMapping.roomLinks=sanitizeArray(roomsArray);
+
 							
 	        }catch (DocumentException e) {
 				log.error("ERROR to get XML",e);
@@ -927,27 +889,27 @@ public class HotelMapping extends Portal implements Mapping{
 	    	}
 	    	return arraySan;    	
 	    }
-	/*private String getJournalArticleByClassPk(Long classPk,String laguage,Long siteID){
+	 
+	private String getJournalArticleByClassPk(Long classPk) throws PortalException, XMLStreamException{
 		 DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(com.liferay.journal.model.impl.JournalArticleImpl.class, "journal",PortalClassLoaderUtil.getClassLoader());			
-		 dynamicQuery.add((PropertyFactoryUtil.forName("resourcePrimKey").eq(classPk)));
+		 dynamicQuery.add((PropertyFactoryUtil.forName("resourcePrimKey").eq(new Long(classPk))));
      	 dynamicQuery.add(RestrictionsFactoryUtil.eq("groupId",Constants.SITE_ID));
 		 HashSet<com.liferay.journal.model.impl.JournalArticleImpl> ja= new HashSet<>(JournalArticleLocalServiceUtil.dynamicQuery(dynamicQuery));
-		 Document docXML=null;
+		 
+		 String result = "";
+		 	
 			for (JournalArticleImpl journalArticleImpl : ja) {
-				try {
 					if(JournalArticleLocalServiceUtil.isLatestVersion(Constants.SITE_ID, journalArticleImpl.getArticleId(), journalArticleImpl.getVersion(),WorkflowConstants.STATUS_APPROVED) && !journalArticleImpl.isInTrash()){
-							docXML = SAXReaderUtil.read(journalArticleImpl.getContentByLocale(laguage));
+						com.consistent.rate.mapping.RoomMapping content = new com.consistent.rate.mapping.RoomMapping();
+						content.RoomContent(journalArticleImpl,Constants.getLanguaje());
+						result = content.mappngRoom();
+							
 					}
-				} catch (PortalException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (DocumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				
 			}
-			return "";
-			}*/
+			
+			return result;
+			}
 	
 }
 

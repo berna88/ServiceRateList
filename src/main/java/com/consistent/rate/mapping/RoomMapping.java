@@ -1,10 +1,19 @@
 package com.consistent.rate.mapping;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
+import com.consistent.rate.constants.Constants;
 import com.consistent.rate.models.hotel.Multimedia;
+import com.consistent.rate.sax.Mapping;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
@@ -33,29 +42,26 @@ public class RoomMapping{
             this.hotelCode = docXML.valueOf("//dynamic-element[@name='hotelCodeRoom']/dynamic-content/text()");
             this.name = docXML.valueOf("//dynamic-element[@name='nameRoom']/dynamic-content/text()");
             this.keywords = docXML.valueOf("//dynamic-element[@name='keywordsRoom']/dynamic-content/text()");
-            List<Node> descriptionsNodes = docXML.selectNodes("//dynamic-element[@name='descriptionsRoom']/dynamic-element");
-            this.descriptions = new ArrayList<String>();
-            for (Node descriptionNode : descriptionsNodes) {
-                String valor = descriptionNode.valueOf("dynamic-content/text()");
-                this.descriptions.add(valor);
-            } 
-            List<Node> mediaLinkNodes = docXML.selectNodes("//dynamic-element[@name='mediaLinksRoom']/dynamic-element");
-            List<com.consistent.rate.models.hotel.Multimedia> mediaArray=new ArrayList<com.consistent.rate.models.hotel.Multimedia>();
-            com.consistent.rate.models.hotel.Multimedia media=null;
-            for(Node mediaNode : mediaLinkNodes){
-            	
-            	String link= mediaNode.valueOf("dynamic-content/text()");
-            	
-            	String type_image= mediaNode.valueOf("dynamic-element[@name='typeRoom']/dynamic-content/text()");
-            	
+            this.description= docXML.valueOf("//dynamic-element[@name='descriptionRoom']/dynamic-content/text()");
+            this.shortDescription=docXML.valueOf("//dynamic-element[@name='shortDescriptionRoom']/dynamic-content/text()");
+        
+            List<Node> mediaNodes = docXML.selectNodes("//dynamic-element[@name='mediaLinksRoom']/dynamic-element");
+			List<String> mediaArray=new ArrayList<String>();
+			for(Node mediaNode : mediaNodes){				
+				String pie= mediaNode.valueOf("dynamic-element[@name='footer']/dynamic-content/text()");				
+				String link= mediaNode.valueOf("dynamic-content/text()");				
+				String type_image= mediaNode.valueOf("dynamic-element[@name='typeRoom']/dynamic-content/text()");						
 				if(!link.trim().equals("")){
-					media= new Multimedia();
-					media.setType(type_image);
-					media.setUrl(link);
-					mediaArray.add(media);
-				}}
-            	
-				this.mediaLinks=mediaArray;
+					JSONObject object=JSONFactoryUtil.createJSONObject();
+					object.put("link", link);
+					object.put("pie", pie);
+					object.put("type_image", type_image);
+					mediaArray.add(object.toJSONString());
+				}	
+								
+            }
+			this.mediaLinks=sanitizeArray(mediaArray);
+
         	} catch (DocumentException e) {
 	            log.error("ERROR get to XML", e);
 	        }
@@ -71,11 +77,11 @@ public class RoomMapping{
     }
 	
   
-    public List<Multimedia> getMediaLinks() {
+    public List<String> getMediaLinks() {
 		return mediaLinks;
 	}
 
-	public void setMediaLinks(List<Multimedia> mediaLinks) {
+	public void setMediaLinks(List<String> mediaLinks) {
 		this.mediaLinks = mediaLinks;
 	}
 
@@ -204,6 +210,96 @@ public class RoomMapping{
 		return log;
 	}
 
+	public String  mappngRoom() throws XMLStreamException{
+	  StringWriter stringWriter = new StringWriter();
+	  XMLOutputFactory xMLOutputFactory = XMLOutputFactory.newInstance();
+  	  XMLStreamWriter xMLStreamWriter =
+       xMLOutputFactory.createXMLStreamWriter(stringWriter);
+ 
+		 
+	        xMLStreamWriter.writeStartElement("room");
+		        xMLStreamWriter.writeStartElement("guid");
+		        	xMLStreamWriter.writeCharacters(getArticleId());
+		        xMLStreamWriter.writeEndElement();
+		        xMLStreamWriter.writeStartElement("code");
+	        		xMLStreamWriter.writeCharacters(getCode());
+	        	xMLStreamWriter.writeEndElement();
+	        	xMLStreamWriter.writeStartElement("name");
+     			xMLStreamWriter.writeCharacters(getName());
+     		xMLStreamWriter.writeEndElement();
+     		xMLStreamWriter.writeStartElement("title");
+ 				xMLStreamWriter.writeCharacters(getTitle());
+ 			xMLStreamWriter.writeEndElement();
+ 			xMLStreamWriter.writeStartElement("language");
+					xMLStreamWriter.writeCharacters(Constants.LENGUAJE);
+				xMLStreamWriter.writeEndElement();
+				xMLStreamWriter.writeStartElement("keyword");
+					xMLStreamWriter.writeCharacters(getKeywords());
+				xMLStreamWriter.writeEndElement();
+				xMLStreamWriter.writeStartElement("shortDescription");
+					xMLStreamWriter.writeCharacters(shortDescription);
+				xMLStreamWriter.writeEndElement();
+				xMLStreamWriter.writeStartElement("description");
+					xMLStreamWriter.writeCharacters(description);
+				xMLStreamWriter.writeEndElement();
+				xMLStreamWriter.writeStartElement("order");
+					xMLStreamWriter.writeCharacters(Mapping.order);
+				xMLStreamWriter.writeEndElement();
+				xMLStreamWriter.writeStartElement("channel");
+					xMLStreamWriter.writeCharacters(Mapping.channel);
+				xMLStreamWriter.writeEndElement();
+				
+
+				//mediaLink section
+				/*mediaLink section*/
+		         JSONArray ArrayMediaLinks = JSONFactoryUtil.createJSONArray();
+		         List<String> MeliaLinkList = getMediaLinks();
+					for (String mediaLinkItem : MeliaLinkList) {
+						JSONObject myObject;
+						try {
+							
+							myObject = JSONFactoryUtil.createJSONObject(mediaLinkItem);
+							ArrayMediaLinks.put(myObject);
+						} catch (JSONException e) {
+						//	log.error("Error converter json"+e);
+						}
+						
+					}
+					xMLStreamWriter.writeStartElement("medialinks");		   
+			         xMLStreamWriter.writeStartElement("medialink");
+			         
+					   xMLStreamWriter.writeStartElement("keyword");
+					   xMLStreamWriter.writeEndElement();
+					         for (int i = 0; i < ArrayMediaLinks.length(); i++) {
+									JSONObject jsonobject = ArrayMediaLinks.getJSONObject(i);
+								    String link = jsonobject.getString("link");
+								    String type_image = jsonobject.getString("type_image");
+									xMLStreamWriter.writeStartElement("multimedia");
+						            xMLStreamWriter.writeAttribute("type",type_image);
+							        xMLStreamWriter.writeStartElement("url");
+							        xMLStreamWriter.writeCharacters(link);
+							        xMLStreamWriter.writeEndElement();
+						            xMLStreamWriter.writeEndElement();
+								}
+					         xMLStreamWriter.writeStartElement("thumbnail");
+					         xMLStreamWriter.writeEndElement();
+					         xMLStreamWriter.writeStartElement("type");
+					         xMLStreamWriter.writeEndElement();
+				      xMLStreamWriter.writeEndElement();
+		         xMLStreamWriter.writeEndElement();
+		          //mediaLink section
+				
+	        xMLStreamWriter.writeEndElement();
+     
+     xMLStreamWriter.flush();
+     xMLStreamWriter.close();
+
+    String xmlString = stringWriter.getBuffer().toString();
+    xmlString=xmlString.replaceAll("\\<\\?xml(.+?)\\?\\>", "").trim();
+    
+    return xmlString;
+
+	}
 	private String articleId;
     private String title;
     private String code;
@@ -211,7 +307,7 @@ public class RoomMapping{
     private String name;
     private String keywords;
     private List<String> descriptions;
-    private List<Multimedia> mediaLinks;
+    private List<String> mediaLinks;
     private String totalCapacity;
     private String childCapacity;
     private String adultCapacity;
@@ -220,6 +316,23 @@ public class RoomMapping{
     private String beds;
     private String articleTitle;
     private String category;
+    private String description;
+    private String shortDescription;
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getShortDescription() {
+		return shortDescription;
+	}
+
+	public void setShortDescription(String shortDescription) {
+		this.shortDescription = shortDescription;
+	}
     
 
 }

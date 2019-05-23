@@ -1,22 +1,20 @@
 package com.consistent.rate.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.consistent.rate.constants.Constants;
-import com.consistent.rate.mapping.GetMappingHotel;
 import com.consistent.rate.mapping.RoomMapping;
-import com.consistent.rate.models.hotel.Hotel;
 import com.consistent.rate.models.hotel.MediaLink;
 import com.consistent.rate.singleton.Portal;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
-import com.liferay.dynamic.data.mapping.exception.NoSuchStructureException;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.model.impl.JournalArticleImpl;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.service.JournalArticleResourceLocalServiceUtil;
-import com.liferay.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
@@ -30,14 +28,6 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
 
 public class Util extends Portal{
 	
@@ -309,7 +299,7 @@ public class Util extends Portal{
 						rom.setDescription(ro.getDescriptions().toString());
 						rom.setOrder("0");
 						rom.setChannel("www");
-						med.setMultimedia(ro.getMediaLinks());
+						//med.setMultimedia(ro.getMediaLinks());
 						med.setType("image");
 						med.setKeyword(ro.getKeywords());
 						mec.add(med);

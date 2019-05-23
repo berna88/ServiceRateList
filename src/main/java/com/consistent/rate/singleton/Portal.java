@@ -3,7 +3,6 @@ package com.consistent.rate.singleton;
 import java.util.List;
 
 import com.consistent.rate.constants.Constants;
-import com.consistent.rate.util.Util;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
@@ -18,7 +17,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 
 public abstract class Portal {
-	private static final Log log = LogFactoryUtil.getLog(Util.class);
+	private static final Log log = LogFactoryUtil.getLog(Portal.class);
 	
 	protected Long getVocabularyId(){
 		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(AssetVocabulary.class, "Vocabulary", PortalClassLoaderUtil.getClassLoader());
