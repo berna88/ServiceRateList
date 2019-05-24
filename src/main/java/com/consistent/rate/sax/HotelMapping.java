@@ -46,61 +46,24 @@ public class HotelMapping extends Portal implements Mapping{
 	private String articleId;
     private String title;
     private String hotelCode;
-    private String travelClickCode;
     private String name;
     private String keyword;
     private String description;
     private String shortDescription;
-    private String bepDescription;
-    private String corporateDescription;
-    private String roomDescription;
     private List<String> amenities;
-        
     private List<String> mediaLinks;
     private List<String> roomLinks;
-    private List<String> facilityLinks;
-    private List<String> destinationLinks;
-    
-    private String contact;
     private String address;
-    private String country;
-    private String state;
     private String city;
-    private String zipCode;
+    private String country;
     private String latitude;
     private String longitude;
     private String references;
     private String addresses;
-    
+    private String state;
+    private String zipCode;    
     private List<String> phones;
-    private List<String> alternativeHotels;
     
-    private String floors;
-    private String rooms;
-    private String elevators;
-    private String restaurants;
-    private String bars;
-    private String swimmingPools;
-    private String stars;
-    private String openingTime;
-    private String closingTime;
-    private String announcements;
-    private String announcementStartingTime;
-    private String announcementFinishingTime;
-    private String checkIn;
-    private String checkOut;
-    private String tripAdvisor;    
-    
-    private List<String> metaCities;
-    private List<String> metaContentType;
-    private List<String> metaCountry;
-    private List<String> metaFeaturesRoom;
-    private List<String> metaBrands;
-    private List<String> metaResorts;
-    private List<String> metaServFacilities;
-    private List<String> metaState;
-    private List<String> metaTags;
-	
 	public String getArticleId() {
 		return articleId;
 	}
@@ -131,15 +94,6 @@ public class HotelMapping extends Portal implements Mapping{
 	public void setHotelCode(String codigo) {
 		this.hotelCode = codigo;
 	}
-
-	public String getTravelClickCode() {
-		return travelClickCode;
-	}
-
-	public void setTravelClickCode(String codigoTravelClick) {
-		this.travelClickCode = codigoTravelClick;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -163,38 +117,7 @@ public class HotelMapping extends Portal implements Mapping{
 	public void setShortDescription(String descripcionCorta) {
 		this.shortDescription = descripcionCorta;
 	}
-
-	public String getBepDescription() {
-		return bepDescription;
-	}
-
-	public void setBepDescription(String descripcionBEP) {
-		this.bepDescription = descripcionBEP;
-	}
-
-	public String getCorporateDescription() {
-		return corporateDescription;
-	}
-
-	public void setCorporateDescription(String descripcionCorporate) {
-		this.corporateDescription = descripcionCorporate;
-	}
-
-	public String getRoomDescription() {
-		return roomDescription;
-	}
-
-	public void setRoomDescription(String descripcionHabitaciones) {
-		this.roomDescription = descripcionHabitaciones;
-	}
-
-	public String getContact() {
-		return contact;
-	}
-
-	public void setContact(String contacto) {
-		this.contact = contacto;
-	}
+	
 
 	public String getAddress() {
 		return address;
@@ -268,143 +191,12 @@ public class HotelMapping extends Portal implements Mapping{
 		this.addresses = direcciones;
 	}
 
-	public String getFloors() {
-		return floors;
-	}
-
-	public void setFloors(String pisos) {
-		this.floors = pisos;
-	}
-
-	public String getRooms() {
-		return rooms;
-	}
-
-	public void setRooms(String habitaciones) {
-		this.rooms = habitaciones;
-	}
-
-	public String getRestaurants() {
-		return restaurants;
-	}
-
-	public void setRestaurants(String restaurantes) {
-		this.restaurants = restaurantes;
-	}
-
-	public String getBars() {
-		return bars;
-	}
-
-	public void setBars(String bares) {
-		this.bars = bares;
-	}
-
-	public String getSwimmingPools() {
-		return swimmingPools;
-	}
-
-	public void setSwimmingPools(String albercas) {
-		this.swimmingPools = albercas;
-	}
-
-	public String getStars() {
-		return stars;
-	}
-
-	public void setStars(String estrellas) {
-		this.stars = estrellas;
-	}
-
-	public String getOpeningTime() {
-		return openingTime;
-	}
-
-	public void setOpeningTime(String fechaApertura) {
-		this.openingTime = fechaApertura;
-	}
-
-	public String getClosingTime() {
-		return closingTime;
-	}
-
-	public void setClosingTime(String fechaCierre) {
-		this.closingTime = fechaCierre;
-	}
-
-	public String getAnnouncements() {
-		return announcements;
-	}
-
-	public void setAnnouncements(String avisos) {
-		this.announcements = avisos;
-	}
-
-	
-
-	public String getAnnouncementStartingTime() {
-		return announcementStartingTime;
-	}
-
-	public void setAnnouncementStartingTime(String fechaInicioAviso) {
-		this.announcementStartingTime = fechaInicioAviso;
-	}
-
-	public String getAnnouncementFinishingTime() {
-		return announcementFinishingTime;
-	}
-
-	public void setAnnouncementFinishingTime(String fechaFinAviso) {
-		this.announcementFinishingTime = fechaFinAviso;
-	}
-
-	public String getCheckIn() {
-		return checkIn;
-	}
-
-	public void setCheckIn(String checkIn) {
-		this.checkIn = checkIn;
-	}
-
-	public String getCheckOut() {
-		return checkOut;
-	}
-
-	public void setCheckOut(String checkOut) {
-		this.checkOut = checkOut;
-	}
-
-	public String getTripAdvisor() {
-		return tripAdvisor;
-	}
-
-	public void setTripAdvisor(String tripAdvisor) {
-		this.tripAdvisor = tripAdvisor;
-	}
-	
 	public List<String> getRoomLinks() {
 		return roomLinks;
 	}
 
 	public void setRoomLinks(List<String> roomLinks) {
 		this.roomLinks = roomLinks;
-	}
-
-	
-	public List<String> getAlternativeHotels() {
-		return alternativeHotels;
-	}
-
-	public void setAlternativeHotels(List<String> hotelesAlternos) {
-		this.alternativeHotels = hotelesAlternos;
-	}
-
-	public String getElevators() {
-		return elevators;
-	}
-
-	public void setElevators(String ascensores) {
-		this.elevators = ascensores;
 	}
 
 	public List<String> getAmenities() {
@@ -422,101 +214,13 @@ public class HotelMapping extends Portal implements Mapping{
 	public void setMediaLinks(List<String> mediaLinksObj) {
 		this.mediaLinks = mediaLinksObj;
 	}
-
-	public List<String> getFacilityLinks() {
-		return facilityLinks;
-	}
-
-	public void setFacilityLinks(List<String> facilityLinks) {
-		this.facilityLinks = facilityLinks;
-	}
-
-	public List<String> getDestinationLinks() {
-		return destinationLinks;
-	}
-
-	public void setDestinationLinks(List<String> destinationLinks) {
-		this.destinationLinks = destinationLinks;
-	}
-
+	
 	public List<String> getPhones() {
 		return phones;
 	}
 
 	public void setPhones(List<String> telefonos) {
 		this.phones = telefonos;
-	}
-
-	public List<String> getMetaCities() {
-		return metaCities;
-	}
-
-	public void setMetaCities(List<String> metaCities) {
-		this.metaCities = metaCities;
-	}
-
-	public List<String> getMetaContentType() {
-		return metaContentType;
-	}
-
-	public void setMetaContentType(List<String> metaContentType) {
-		this.metaContentType = metaContentType;
-	}
-
-	public List<String> getMetaCountry() {
-		return metaCountry;
-	}
-
-	public void setMetaCountry(List<String> metaCountry) {
-		this.metaCountry = metaCountry;
-	}
-
-	public List<String> getMetaFeaturesRoom() {
-		return metaFeaturesRoom;
-	}
-
-	public void setMetaFeaturesRoom(List<String> metaFeaturesRoom) {
-		this.metaFeaturesRoom = metaFeaturesRoom;
-	}
-
-	public List<String> getMetaBrands() {
-		return metaBrands;
-	}
-
-	public void setMetaBrands(List<String> metaMarcas) {
-		this.metaBrands = metaMarcas;
-	}
-
-	public List<String> getMetaResorts() {
-		return metaResorts;
-	}
-
-	public void setMetaResorts(List<String> metaResorts) {
-		this.metaResorts = metaResorts;
-	}
-
-	public List<String> getMetaServFacilities() {
-		return metaServFacilities;
-	}
-
-	public void setMetaServFacilities(List<String> metaServFacilities) {
-		this.metaServFacilities = metaServFacilities;
-	}
-
-	public List<String> getMetaState() {
-		return metaState;
-	}
-
-	public void setMetaState(List<String> metaState) {
-		this.metaState = metaState;
-	}
-
-	public List<String> getMetaTags() {
-		return metaTags;
-	}
-
-	public void setMetaTags(List<String> metaTags) {
-		this.metaTags = metaTags;
 	}
 	
 	//Metodo que obtienes todos los hoteles
@@ -534,28 +238,36 @@ public class HotelMapping extends Portal implements Mapping{
 				log.info("Folder id: "+folderId);
 				
 				if(!Constants.CODIGODEHOTEL.isEmpty()){
+					log.info("Entro al filtrado");
 					DynamicQuery dynamicQueryJournal = DynamicQueryFactoryUtil.forClass(JournalArticleImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
 					dynamicQueryJournal.add(PropertyFactoryUtil.forName("DDMStructureKey").eq(results.getStructureKey()));
 					dynamicQueryJournal.add(PropertyFactoryUtil.forName("groupId").eq(new Long(Constants.SITE_ID)));
 					dynamicQueryJournal.add(PropertyFactoryUtil.forName("folderId").eq(getFolderId(Constants.CODIGODEHOTEL)));
 					final HashSet<JournalArticle> journalArticles = new HashSet<JournalArticle>(JournalArticleLocalServiceUtil.dynamicQuery(dynamicQueryJournal));
 					for (JournalArticle journal : journalArticles) {
-							if(JournalArticleLocalServiceUtil.isLatestVersion(Constants.SITE_ID, journal.getArticleId(), journal.getVersion(),WorkflowConstants.STATUS_APPROVED) && !journal.isInTrash()){
+						if(!journal.isInTrash()){
+							if(JournalArticleLocalServiceUtil.isLatestVersion(Constants.SITE_ID, journal.getArticleId(), journal.getVersion(),WorkflowConstants.STATUS_APPROVED)){
 								hotels.add(HotelContentsMapping(journal, Constants.getLanguaje()));
-								//hotels.add(journal.toString());
+								
 							} 
+						}
+							
 					}
 				}else{
+					log.info("Entro al no filtrado");
 					DynamicQuery dynamicQueryJournal = DynamicQueryFactoryUtil.forClass(JournalArticleImpl.class, "folder", PortalClassLoaderUtil.getClassLoader());
 					dynamicQueryJournal.add(PropertyFactoryUtil.forName("DDMStructureKey").eq(results.getStructureKey()));
 					dynamicQueryJournal.add(PropertyFactoryUtil.forName("groupId").eq(new Long(Constants.SITE_ID)));
 					dynamicQueryJournal.add(PropertyFactoryUtil.forName("treePath").like("%"+folderId+"%"));
 					final HashSet<JournalArticle> journalArticles = new HashSet<JournalArticle>(JournalArticleLocalServiceUtil.dynamicQuery(dynamicQueryJournal));
 					for (JournalArticle journal : journalArticles) {
-							if(JournalArticleLocalServiceUtil.isLatestVersion(Constants.SITE_ID, journal.getArticleId(), journal.getVersion(),WorkflowConstants.STATUS_APPROVED) && !journal.isInTrash()){
+						if(!journal.isInTrash()){
+							if(JournalArticleLocalServiceUtil.isLatestVersion(Constants.SITE_ID, journal.getArticleId(), journal.getVersion(),WorkflowConstants.STATUS_APPROVED)){
 								hotels.add(HotelContentsMapping(journal, Constants.getLanguaje()));
-								//hotels.add(journal.toString());
+								
 							} 
+						}
+							
 					}
 				}
 				
@@ -626,7 +338,7 @@ public class HotelMapping extends Portal implements Mapping{
 							myObject = JSONFactoryUtil.createJSONObject(mediaLinkItem);
 							ArrayMediaLinks.put(myObject);
 						} catch (JSONException e) {
-						//	log.error("Error converter json"+e);
+						log.error("Error converter json"+e);
 						}
 						
 					}
@@ -704,30 +416,23 @@ public class HotelMapping extends Portal implements Mapping{
 			        	}
 					}
 			        xMLStreamWriter.writeEndElement();
-			        //telephone section
+			        //fin telephone section
 			        //rooms
-					
 					JSONArray ArrayRoom = JSONFactoryUtil.createJSONArray();
 					xMLStreamWriter.writeStartElement("rooms");
 					for(String roomLink : getRoomLinks()){				
 							JSONObject object=null;
 								try {
 									object=JSONFactoryUtil.createJSONObject(roomLink);
-									String classpk=object.getString("classPK");
-									xMLStreamWriter.writeDTD(getJournalArticleByClassPk(Long.parseLong(classpk)));
+									long classpk=object.getLong("classPK");
+									xMLStreamWriter.writeDTD(getJournalArticleByClassPk(classpk));
 									ArrayRoom.put(object);		
 								} catch (JSONException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
-								}
-												
+								}			
 					}
 					xMLStreamWriter.writeEndElement();
-										
-		            
-			       
-			        
-			        
 			        //fin rooms
 			//Root 
 	         xMLStreamWriter.writeEndDocument();
@@ -740,26 +445,58 @@ public class HotelMapping extends Portal implements Mapping{
 	         stringWriter.close();
 
 	        xmlString=xmlString.replaceAll("\\<\\?xml(.+?)\\?\\>", "").trim();
-	        return xmlString;
-	
-	        
+	        return xmlString;        
 	}
 
-	
-	public HotelMapping(String articleId, String title, String hotelCode, String name) {
+	public HotelMapping(String articleId, String title, String hotelCode, String name, String keyword,
+			String description, String shortDescription, List<String> amenities, List<String> mediaLinks,
+			List<String> roomLinks, String address, String city, String country, String latitude, String longitude,
+			String references, String addresses, String state, String zipCode, List<String> phones) {
 		super();
 		this.articleId = articleId;
 		this.title = title;
 		this.hotelCode = hotelCode;
 		this.name = name;
+		this.keyword = keyword;
+		this.description = description;
+		this.shortDescription = shortDescription;
+		this.amenities = amenities;
+		this.mediaLinks = mediaLinks;
+		this.roomLinks = roomLinks;
+		this.address = address;
+		this.city = city;
+		this.country = country;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.references = references;
+		this.addresses = addresses;
+		this.state = state;
+		this.zipCode = zipCode;
+		this.phones = phones;
 	}
-	
+
 	public HotelMapping() {
 		super();
 		this.articleId = "";
 		this.title = "";
 		this.hotelCode = "";
 		this.name = "";
+		this.keyword = "";
+		this.description = "";
+		this.shortDescription = "";
+		this.amenities = new ArrayList<>();
+		this.mediaLinks = new ArrayList<>();
+		this.roomLinks = new ArrayList<>();
+		this.address = "";
+		this.city = "";
+		this.country = "";
+		this.latitude = "";
+		this.longitude = "";
+		this.references = "";
+		this.addresses = "";
+		this.state = "";
+		this.zipCode = "";
+		this.phones = new ArrayList<>();
 	}
 	
 	private String HotelContentsMapping(JournalArticle content, String locale) throws XMLStreamException, IOException, NumberFormatException, PortalException{
@@ -777,10 +514,6 @@ public class HotelMapping extends Portal implements Mapping{
 				hotelMapping.name =docXML.valueOf("//dynamic-element[@name='nameHotel']/dynamic-content/text()");
 				hotelMapping.description=docXML.valueOf("//dynamic-element[@name='descriptionHotel']/dynamic-content/text()");
 				hotelMapping.shortDescription=docXML.valueOf("//dynamic-element[@name='shortDescriptionHotel']/dynamic-content/text()");
-				hotelMapping.bepDescription=docXML.valueOf("//dynamic-element[@name='BEPDescription']/dynamic-content/text()");
-				hotelMapping.corporateDescription=docXML.valueOf("//dynamic-element[@name='corpoRateDescription']/dynamic-content/text()");
-				hotelMapping.roomDescription=docXML.valueOf("//dynamic-element[@name='descriptionRoomsHotel']/dynamic-content/text()");
-				
 				List<Node> addressNodes = docXML.selectNodes("//dynamic-element[@name='addressHotel']/dynamic-element");
 				
 				for(Node addressNode : addressNodes){
@@ -881,7 +614,7 @@ public class HotelMapping extends Portal implements Mapping{
 	        
 	}
 	
-	 private List<String> sanitizeArray(List<String> arraySan){
+	private List<String> sanitizeArray(List<String> arraySan){
 	    	if(arraySan.size()>0){
 		    	while(arraySan.size()<2){
 					JSONObject object=JSONFactoryUtil.createJSONObject();
@@ -892,20 +625,22 @@ public class HotelMapping extends Portal implements Mapping{
 	    }
 	 
 	private String getJournalArticleByClassPk(Long classPk) throws PortalException, XMLStreamException{
+		 //log.info("<------- getJournalArticleByClassPk ------->");	
 		 DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(com.liferay.journal.model.impl.JournalArticleImpl.class, "journal",PortalClassLoaderUtil.getClassLoader());			
 		 dynamicQuery.add((PropertyFactoryUtil.forName("resourcePrimKey").eq(new Long(classPk))));
      	 dynamicQuery.add(RestrictionsFactoryUtil.eq("groupId",Constants.SITE_ID));
 		 HashSet<com.liferay.journal.model.impl.JournalArticleImpl> ja= new HashSet<>(JournalArticleLocalServiceUtil.dynamicQuery(dynamicQuery));
-		 
-		 String result = "";
-		 	
+		 String result = "";	
 			for (JournalArticleImpl journalArticleImpl : ja) {
-					if(JournalArticleLocalServiceUtil.isLatestVersion(Constants.SITE_ID, journalArticleImpl.getArticleId(), journalArticleImpl.getVersion(),WorkflowConstants.STATUS_APPROVED) && !journalArticleImpl.isInTrash()){
-						com.consistent.rate.sax.RoomMapping content = new com.consistent.rate.sax.RoomMapping();
-						content.RoomContent(journalArticleImpl,Constants.getLanguaje());
-						result = content.mappngRoom();
-							
+					if(!journalArticleImpl.isInTrash()){
+						if(JournalArticleLocalServiceUtil.isLatestVersion(Constants.SITE_ID, journalArticleImpl.getArticleId(), journalArticleImpl.getVersion(),WorkflowConstants.STATUS_APPROVED)){
+							com.consistent.rate.sax.RoomMapping content = new com.consistent.rate.sax.RoomMapping();
+							content.RoomContent(journalArticleImpl,Constants.getLanguaje());
+							result = content.mappngRoom();
+								
+						}
 					}
+					
 				
 			}
 			

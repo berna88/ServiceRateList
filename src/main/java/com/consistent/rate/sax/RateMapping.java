@@ -47,170 +47,90 @@ public class RateMapping extends Portal implements Mapping{
 	public String getGuid() {
 		return guid;
 	}
-
-
-
 	public void setGuid(String guid) {
 		this.guid = guid;
 	}
-
-
-
 	public String getCode() {
 		return code;
 	}
-
-
-
 	public void setCode(String code) {
 		this.code = code;
 	}
-
-
-
 	public String getName() {
 		return name;
 	}
-
-
-
 	public void setName(String name) {
 		this.name = name;
 	}
-
-
-
 	public String getTitle() {
 		return title;
 	}
-
-
-
 	public void setTitle(String title) {
 		this.title = title;
 	}
-
-
-
 	public String getLanguage() {
 		return language;
 	}
-
-
-
 	public void setLanguage(String language) {
 		this.language = language;
 	}
-
-
-
 	public String getKeyword() {
 		return keyword;
 	}
-
-
-
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
 	}
-
-
-
 	public String getShortDescription() {
 		return shortDescription;
 	}
-
-
-
 	public void setShortDescription(String shortDescription) {
 		this.shortDescription = shortDescription;
 	}
-
-
-
 	public String getDescription() {
 		return description;
 	}
-
-
-
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-
-
 	public String getOrder() {
 		return order;
 	}
-
-
-
 	public void setOrder(String order) {
 		this.order = order;
 	}
-
-
-
 	public String getChannel() {
 		return channel;
 	}
-
-
-
 	public void setChannel(String channel) {
 		this.channel = channel;
 	}
-
-
-
 	public String getBenefits() {
 		return benefits;
 	}
-
-
-
 	public void setBenefits(String benefits) {
 		this.benefits = benefits;
 	}
-
-
-
 	public String getRestrictions() {
 		return restrictions;
 	}
-
-
-
 	public void setRestrictions(String restrictions) {
 		this.restrictions = restrictions;
 	}
-
-
-
 	public String getEnddate() {
 		return enddate;
 	}
-
-
-
 	public void setEnddate(String enddate) {
 		this.enddate = enddate;
 	}
-
-
-
 	public String getCurrency() {
 		return currency;
 	}
-
-
-
 	public void setCurrency(String currency) {
 		this.currency = currency;
 	}
-	
+	//Constructor vacio
 	public RateMapping(){
+		this.guid = "";
 		this.code = "";
 		this.name = "";
 		this.title = "";
@@ -223,7 +143,7 @@ public class RateMapping extends Portal implements Mapping{
 		this.enddate = "";
 		this.currency = "";
 	}
-	
+	//Constructor con parametros
 	public RateMapping(String guid, String code, String name, String title, String language, String keyword,
 			String shortDescription, String description, String benefits,
 			String restrictions, String enddate, String currency) {
@@ -241,9 +161,7 @@ public class RateMapping extends Portal implements Mapping{
 		this.enddate = enddate;
 		this.currency = currency;
 	}
-
-
-
+	
 	@Override
 	public String getMapping() throws XMLStreamException, IOException{
 		StringWriter stringWriter = new StringWriter();
@@ -327,7 +245,8 @@ public class RateMapping extends Portal implements Mapping{
 		assetEntryQuery.setGroupIds(new long[]{Constants.SITE_ID} );
 		assetEntryQuery.setAnyCategoryIds(new long[] { categoryId });
 		assetEntryQuery.setClassName("com.liferay.journal.model.JournalArticle");
-		final HashSet<AssetEntry> assetEntryList = new HashSet<AssetEntry>(AssetEntryLocalServiceUtil.getEntries(assetEntryQuery));//convirtiendo la lista en hashSet
+		//convirtiendo la lista en hashSet
+		final HashSet<AssetEntry> assetEntryList = new HashSet<AssetEntry>(AssetEntryLocalServiceUtil.getEntries(assetEntryQuery));
 		log.info("Tamaño de elemento por categorias: "+assetEntryList.size());
 		RateMapping mapping = new RateMapping();
 		try {
@@ -335,16 +254,12 @@ public class RateMapping extends Portal implements Mapping{
 				// JournalArticleResource journalArticleResource = JournalArticleResourceLocalServiceUtil.getJournalArticleResource(ae.getClassPK());
 			    // JournalArticle journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleResource.getResourcePrimKey());
 			    final JournalArticle journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(ae.getClassPK());
-								//article.add(journalArticle);
-								//final Rate rate = new Rate();
-								//rate.setTitle(journalArticle.getTitle(locale));
+								
 								Document document = null;
 								
 								document = SAXReaderUtil.read(journalArticle.getContentByLocale(locale));
 									
 									if(!Constants.CHECKINDATE.isEmpty()){
-										//log.info("fecha: "+document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"));
-										//log.info(getIntervals(Constants.CHECKINDATE, Constants.CHECKOUTDATE, document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()")));
 										if(getIntervals(Constants.CHECKINDATE, Constants.CHECKOUTDATE, document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()"))){
 											mapping = new RateMapping(); 
 											mapping.code = document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()");
@@ -375,32 +290,7 @@ public class RateMapping extends Portal implements Mapping{
 										mapping.guid = journalArticle.getArticleId();
 										mapping.language = Constants.LENGUAJE;
 									}
-									
-									/*
-									
-									List<Multimedia> multimedia = new ArrayList<>();
-									Multimedia multi = new Multimedia();
-									multi.setUrl(document.valueOf("//dynamic-element[@name='mediaLinkRate']/dynamic-content/text()"));
-									multi.setType("icon");
-									multimedia.add(multi);
-									
-									List<MediaLink> medialink = new ArrayList<>();
-									MediaLink link = new MediaLink();
-									link.setKeyword("rate_icon");
-									link.setType("image");
-									link.setMultimedia(multimedia);
-									medialink.add(link);
-									
-									List<MediaLinks> mediaLinks = new ArrayList<>();
-									MediaLinks links = new MediaLinks();
-									links.setMedialinks(medialink);
-									mediaLinks.add(links);
-									rate.setMediaLinks(mediaLinks);
-									rates.add(rate);*/
 									rates.add(mapping);
-						
-				   // article.add(journalArticle);
-				    
 			}
 		} catch (Exception e) {
 			log.error("module getWebContentRate: "+e);
@@ -432,12 +322,11 @@ public class RateMapping extends Portal implements Mapping{
 						{
 							if(journalArticle.getContent().contains(codesSplit[i]))
 							   {
-								//article.add(journalArticle);
 								
 								Document document = null;
+								
 								document = SAXReaderUtil.read(journalArticle.getContentByLocale(locale));
 								
-								 
 								mapping = new RateMapping(); 
 								mapping.code = document.valueOf("//dynamic-element[@name='codeRate']/dynamic-content/text()");
 								mapping.name = document.valueOf("//dynamic-element[@name='nameRate']/dynamic-content/text()");
@@ -451,31 +340,11 @@ public class RateMapping extends Portal implements Mapping{
 								mapping.enddate = document.valueOf("//dynamic-element[@name='finalDateBooking']/dynamic-content/text()");
 								mapping.guid = journalArticle.getArticleId();
 								mapping.language = Constants.LENGUAJE;
-								/*
-								List<Multimedia> multimedia = new ArrayList<>();
-								Multimedia multi = new Multimedia();
-								multi.setUrl(document.valueOf("//dynamic-element[@name='mediaLinkRate']/dynamic-content/text()"));
-								multi.setType("icon");
-								multimedia.add(multi);
-								
-								List<MediaLink> medialink = new ArrayList<>();
-								MediaLink link = new MediaLink();
-								link.setKeyword("rate_icon");
-								link.setType("image");
-								link.setMultimedia(multimedia);
-								medialink.add(link);
-								
-								List<MediaLinks> mediaLinks = new ArrayList<>();
-								MediaLinks links = new MediaLinks();
-								links.setMedialinks(medialink);
-								mediaLinks.add(links);
-								rate.setMediaLinks(mediaLinks);*/
 								rates.add(mapping);
 							   
-							   break;}
+							   break;
+							   }
 						}
-				   // article.add(journalArticle);
-				   
 			}
 		} catch (Exception e) {
 			log.error("module getWebContentRate: "+e);
@@ -499,8 +368,9 @@ public class RateMapping extends Portal implements Mapping{
 					String[] codesSplit = codes.split(",");
 					rates = getWebContentRateFilter(codesSplit,locale);
 				}else{
-					rates = getWebContentRate(locale);
 					log.info("Sin contratos");
+					rates = getWebContentRate(locale);
+					
 				}
 				return rates;
 			}

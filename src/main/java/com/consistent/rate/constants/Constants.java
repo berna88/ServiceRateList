@@ -18,6 +18,8 @@ public class Constants {
 	public static final String MARCAS = "Marcas";
 	// SITE ID
 	public static Long SITE_ID = null;
+	// NOMBRE DE CARPETAS
+	public static String NOMBRE_CARPETA_HOTEL = "Hotel";
 	
 	
 	public static Long STRUCTURE_HOTEL_ID = null;
@@ -67,7 +69,6 @@ public class Constants {
 		}
 	// ValidContractCodes
 		public static void validContractCodes(String contractcodes){
-			log.info("contractcodes:"+contractcodes);
 			if(contractcodes != null && !contractcodes.isEmpty()){
 				CONTRACTCODES = contractcodes;
 			}else {

@@ -24,12 +24,124 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
 
 public class RoomMapping{
+	
+	private static final Log log = LogFactoryUtil.getLog(RoomMapping.class);
+	
+	private String articleId;
+	private String code;
+	private String name;
+    private String title;
+    private String keywords;
+    private String description;
+    private String shortDescription;
+    private List<String> mediaLinks;
+    private String articleTitle;
+    
+	public String getDescription() {
+		return description;
+	}
 
-    private static final Log log = LogFactoryUtil.getLog(RoomMapping.class);
-    public RoomMapping() {
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getShortDescription() {
+		return shortDescription;
+	}
+
+	public void setShortDescription(String shortDescription) {
+		this.shortDescription = shortDescription;
+	}
+	
+	 public List<String> getMediaLinks() {
+			return mediaLinks;
+		}
+
+		public void setMediaLinks(List<String> mediaLinks) {
+			this.mediaLinks = mediaLinks;
+		}
+
+		public String getArticleId() {
+	        return articleId;
+	    }
+
+	    public void setArticleId(String articleId) {
+	        this.articleId = articleId;
+	    }
+
+	    public String getTitle() {
+	        return title;
+	    }
+
+	    public void setTitle(String title) {
+	        this.title = title;
+	    }
+
+	    public String getCode() {
+	        return code;
+	    }
+
+	    public void setCode(String code) {
+	        this.code = code;
+	    }
+
+	    public String getName() {
+	        return name;
+	    }
+
+	    public void setName(String name) {
+	        this.name = name;
+	    }
+
+		public String getKeywords() {
+			return keywords;
+		}
+
+		public void setKeywords(String keywords) {
+			this.keywords = keywords;
+		}
+
+		public String getArticleTitle() {
+			return articleTitle;
+		}
+
+		public void setArticleTitle(String articleTitle) {
+			this.articleTitle = articleTitle;
+		}
+
+		public static Log getLog() {
+			return log;
+		}
+		
+		
+
+    public RoomMapping(String articleId, String code, String name, String title, String keywords,
+				String description, String shortDescription, List<String> mediaLinks, String articleTitle) {
+			super();
+			this.articleId = articleId;
+			this.code = code;
+			this.name = name;
+			this.title = title;
+			this.keywords = keywords;
+			this.description = description;
+			this.shortDescription = shortDescription;
+			this.mediaLinks = mediaLinks;
+			this.articleTitle = articleTitle;
+		}
+    
+    public RoomMapping(){
+    	this.articleId = "";
+		this.code = "";
+		this.name = "";
+		this.title = "";
+		this.keywords = "";
+		this.description = "";
+		this.shortDescription = "";
+		this.mediaLinks = new ArrayList<>();
+		this.articleTitle = "";
     }
 
-    public void  RoomContent(JournalArticle content, String locale) {
+	public void  RoomContent(JournalArticle content, String locale) {
     	
         this.articleId = content.getArticleId();
         this.title = content.getTitle(locale);
@@ -38,7 +150,6 @@ public class RoomMapping{
         try {
             docXML = SAXReaderUtil.read(content.getContentByLocale(locale));
             this.code = docXML.valueOf("//dynamic-element[@name='codeRoom']/dynamic-content/text()");
-            this.hotelCode = docXML.valueOf("//dynamic-element[@name='hotelCodeRoom']/dynamic-content/text()");
             this.name = docXML.valueOf("//dynamic-element[@name='nameRoom']/dynamic-content/text()");
             this.keywords = docXML.valueOf("//dynamic-element[@name='keywordsRoom']/dynamic-content/text()");
             this.description= docXML.valueOf("//dynamic-element[@name='descriptionRoom']/dynamic-content/text()");
@@ -65,6 +176,7 @@ public class RoomMapping{
 	            log.error("ERROR get to XML", e);
 	        }
     }
+    
     public List<String> sanitizeArray(List<String> arraySan){
     	if(arraySan.size()>0){
 	    	while(arraySan.size()<2){
@@ -76,145 +188,12 @@ public class RoomMapping{
     }
 	
   
-    public List<String> getMediaLinks() {
-		return mediaLinks;
-	}
-
-	public void setMediaLinks(List<String> mediaLinks) {
-		this.mediaLinks = mediaLinks;
-	}
-
-	public String getArticleId() {
-        return articleId;
-    }
-
-    public void setArticleId(String articleId) {
-        this.articleId = articleId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getHotelCode() {
-		return hotelCode;
-	}
-
-	public void setHotelCode(String hotelCode) {
-		this.hotelCode = hotelCode;
-	}
-
-	public String getKeywords() {
-		return keywords;
-	}
-
-	public void setKeywords(String keywords) {
-		this.keywords = keywords;
-	}
-
-	public List<String> getDescriptions() {
-		return descriptions;
-	}
-
-	public void setDescriptions(List<String> descriptions) {
-		this.descriptions = descriptions;
-	}
-
-	public String getTotalCapacity() {
-		return totalCapacity;
-	}
-
-	public void setTotalCapacity(String totalCapacity) {
-		this.totalCapacity = totalCapacity;
-	}
-
-	public String getChildCapacity() {
-		return childCapacity;
-	}
-
-	public void setChildCapacity(String childCapacity) {
-		this.childCapacity = childCapacity;
-	}
-
-	public String getAdultCapacity() {
-		return adultCapacity;
-	}
-
-	public void setAdultCapacity(String adultCapacity) {
-		this.adultCapacity = adultCapacity;
-	}
-
-	public String getDimension() {
-		return dimension;
-	}
-
-	public void setDimension(String dimension) {
-		this.dimension = dimension;
-	}
-
-	public String getInventary() {
-		return inventary;
-	}
-
-	public void setInventary(String inventary) {
-		this.inventary = inventary;
-	}
-
-	public String getBeds() {
-		return beds;
-	}
-
-	public void setBeds(String beds) {
-		this.beds = beds;
-	}
-
-	
-	public String getArticleTitle() {
-		return articleTitle;
-	}
-
-	public void setArticleTitle(String articleTitle) {
-		this.articleTitle = articleTitle;
-	}
-
-	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
-	}
-
-	public static Log getLog() {
-		return log;
-	}
-
-	public String  mappngRoom() throws XMLStreamException{
+   
+	public String mappngRoom() throws XMLStreamException{
 	  StringWriter stringWriter = new StringWriter();
 	  XMLOutputFactory xMLOutputFactory = XMLOutputFactory.newInstance();
   	  XMLStreamWriter xMLStreamWriter =
-       xMLOutputFactory.createXMLStreamWriter(stringWriter);
- 
+      xMLOutputFactory.createXMLStreamWriter(stringWriter);
 		 
 	        xMLStreamWriter.writeStartElement("room");
 		        xMLStreamWriter.writeStartElement("guid");
@@ -260,7 +239,7 @@ public class RoomMapping{
 							myObject = JSONFactoryUtil.createJSONObject(mediaLinkItem);
 							ArrayMediaLinks.put(myObject);
 						} catch (JSONException e) {
-						//	log.error("Error converter json"+e);
+							log.error("Error converter json"+e);
 						}
 						
 					}
@@ -299,39 +278,7 @@ public class RoomMapping{
     return xmlString;
 
 	}
-	private String articleId;
-    private String title;
-    private String code;
-    private String hotelCode;
-    private String name;
-    private String keywords;
-    private List<String> descriptions;
-    private List<String> mediaLinks;
-    private String totalCapacity;
-    private String childCapacity;
-    private String adultCapacity;
-    private String dimension;
-    private String inventary;
-    private String beds;
-    private String articleTitle;
-    private String category;
-    private String description;
-    private String shortDescription;
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getShortDescription() {
-		return shortDescription;
-	}
-
-	public void setShortDescription(String shortDescription) {
-		this.shortDescription = shortDescription;
-	}
+	
     
 
 }
