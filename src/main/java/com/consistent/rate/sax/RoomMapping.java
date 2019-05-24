@@ -215,10 +215,10 @@ public class RoomMapping{
 					xMLStreamWriter.writeCharacters(getKeywords());
 				xMLStreamWriter.writeEndElement();
 				xMLStreamWriter.writeStartElement("shortDescription");
-					xMLStreamWriter.writeCharacters(shortDescription);
+					xMLStreamWriter.writeDTD(shortDescription);
 				xMLStreamWriter.writeEndElement();
 				xMLStreamWriter.writeStartElement("description");
-					xMLStreamWriter.writeCharacters(description);
+					xMLStreamWriter.writeDTD(description);
 				xMLStreamWriter.writeEndElement();
 				xMLStreamWriter.writeStartElement("order");
 					xMLStreamWriter.writeCharacters(Mapping.order);

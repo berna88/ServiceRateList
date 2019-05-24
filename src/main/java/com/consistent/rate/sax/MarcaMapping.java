@@ -174,7 +174,7 @@ public class MarcaMapping implements Mapping{
 						xMLStreamWriter.writeStartElement("rates");
 				
 							for (RateMapping rateMappingR : rateMapping) {
-								xMLStreamWriter.writeCharacters(rateMappingR.getMapping());
+								xMLStreamWriter.writeDTD(rateMappingR.getMapping());
 							}
 						xMLStreamWriter.writeEndElement();//rates
 						for (String hotel : hotels) {

@@ -317,10 +317,10 @@ public class HotelMapping extends Portal implements Mapping{
 		        	xMLStreamWriter.writeCharacters(keyword);
 		        xMLStreamWriter.writeEndElement();
 		        xMLStreamWriter.writeStartElement("shortDescription");
-		        	xMLStreamWriter.writeCharacters(shortDescription);
+		        	xMLStreamWriter.writeDTD(shortDescription);
 		        xMLStreamWriter.writeEndElement();
 		        xMLStreamWriter.writeStartElement("description");
-		        	xMLStreamWriter.writeCharacters(description);
+		        	xMLStreamWriter.writeDTD(description);
 		        xMLStreamWriter.writeEndElement();
 		        xMLStreamWriter.writeStartElement("order");
 		        	xMLStreamWriter.writeCharacters(Mapping.order);
@@ -443,7 +443,6 @@ public class HotelMapping extends Portal implements Mapping{
 	         String xmlString = stringWriter.getBuffer().toString();
 	      
 	         stringWriter.close();
-
 	        xmlString=xmlString.replaceAll("\\<\\?xml(.+?)\\?\\>", "").trim();
 	        return xmlString;        
 	}

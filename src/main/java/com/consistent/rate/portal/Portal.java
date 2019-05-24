@@ -45,8 +45,12 @@ public abstract class Portal {
 		try {
 			List<AssetCategory> assetCategories = AssetCategoryLocalServiceUtil.dynamicQuery(dynamicQuery);
 			categoryId = assetCategories.get(0).getCategoryId();
-		} catch (Exception e) {
-			log.error("module getCategory: "+e);
+		}catch (IndexOutOfBoundsException e) {
+			// TODO: handle exception
+			log.error("Codigo de marca incorrecto: "+e);
+		}catch (NullPointerException e) {
+			// TODO: handle exception
+			log.error("null: "+e);
 		}
 		log.info("Categoria Id: "+ categoryId);
 		return categoryId;

@@ -188,10 +188,10 @@ public class RateMapping extends Portal implements Mapping{
 					xMLStreamWriter.writeCharacters(keyword);
 				xMLStreamWriter.writeEndElement();
 				xMLStreamWriter.writeStartElement("shortDescription");
-					xMLStreamWriter.writeCharacters(shortDescription);
+					xMLStreamWriter.writeDTD(shortDescription);
 				xMLStreamWriter.writeEndElement();
 				xMLStreamWriter.writeStartElement("description");
-					xMLStreamWriter.writeCharacters(description);
+					xMLStreamWriter.writeDTD(description);
 				xMLStreamWriter.writeEndElement();
 				xMLStreamWriter.writeStartElement("order");
 					xMLStreamWriter.writeCharacters(order);
@@ -200,10 +200,10 @@ public class RateMapping extends Portal implements Mapping{
 					xMLStreamWriter.writeCharacters(channel);
 				xMLStreamWriter.writeEndElement();
 				xMLStreamWriter.writeStartElement("benefits");
-					xMLStreamWriter.writeCharacters(benefits);
+					xMLStreamWriter.writeDTD(benefits);
 				xMLStreamWriter.writeEndElement();
 				xMLStreamWriter.writeStartElement("restrictions");
-					xMLStreamWriter.writeCharacters(restrictions);
+					xMLStreamWriter.writeDTD(restrictions);
 				xMLStreamWriter.writeEndElement();
 				xMLStreamWriter.writeStartElement("enddate");
 					xMLStreamWriter.writeCharacters(enddate);

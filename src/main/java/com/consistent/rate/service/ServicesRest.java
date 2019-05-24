@@ -48,6 +48,9 @@ public class ServicesRest extends Portal{
 		Constants.CODIGODEHOTEL = hotelcode;
 		//Estableciendo canal
 		Constants.CHANNEL = channel;
+		//Fechas
+		Constants.CHECKINDATE = checkindate;
+		Constants.CHECKOUTDATE = checkoutdate;
 		
 		String xml = sax.getXML();
 		log.info("<-------- Proceso finalizado getHotelRoomRates--------->");
