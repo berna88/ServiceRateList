@@ -17,7 +17,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
-@Path("/services/posadas")
+@Path("/services/posadas-rate")
 public class ServicesRest extends Portal{
 	
 	private static final Log log = LogFactoryUtil.getLog(ServicesRest.class);
@@ -25,7 +25,7 @@ public class ServicesRest extends Portal{
 	final SAX sax = new Util();
 	
 	@GET
-	@Path("/getHotelRoomRates")
+	@Path("/HotelRoomRates")
 	@Produces(MediaType.APPLICATION_XML)
 	public String getRate(
 			@QueryParam("siteID") String siteID,
@@ -58,7 +58,7 @@ public class ServicesRest extends Portal{
 	}
 
 	@GET
-	@Path("/getHotelRoomRatesOptimizado")
+	@Path("/HotelRoomRatesOptimizado")
 	@Produces(MediaType.APPLICATION_XML)
 	public String getRatesOptimizado(
 			@QueryParam("siteID") String siteID,

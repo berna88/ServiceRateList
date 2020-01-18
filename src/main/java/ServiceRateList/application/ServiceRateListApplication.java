@@ -11,7 +11,7 @@ import com.consistent.rate.service.ServicesRest;
 /**
  * @author liferay
  */
-@ApplicationPath("/rates")
+@ApplicationPath("/serv-rate")
 @Component(immediate=true,service=Application.class)
 
 public class ServiceRateListApplication extends Application {

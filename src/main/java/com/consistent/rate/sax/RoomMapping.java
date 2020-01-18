@@ -158,9 +158,9 @@ public class RoomMapping{
             List<Node> mediaNodes = docXML.selectNodes("//dynamic-element[@name='mediaLinksRoom']/dynamic-element");
 			List<String> mediaArray=new ArrayList<String>();
 			for(Node mediaNode : mediaNodes){				
-				String pie= mediaNode.valueOf("dynamic-element[@name='footer']/dynamic-content/text()");				
-				String link= mediaNode.valueOf("dynamic-content/text()");				
-				String type_image= mediaNode.valueOf("dynamic-element[@name='typeRoom']/dynamic-content/text()");						
+				String pie= mediaNode.valueOf("dynamic-element[@name='footer']/dynamic-content/text()");		
+				String link= mediaNode.valueOf("dynamic-content/text()");
+				String type_image= mediaNode.valueOf("dynamic-element[@name='typeRoom']/dynamic-content/text()");
 				if(!link.trim().equals("")){
 					JSONObject object=JSONFactoryUtil.createJSONObject();
 					object.put("link", link);
